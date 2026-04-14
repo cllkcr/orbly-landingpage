@@ -8,11 +8,17 @@ export default function WaitlistCounter() {
 
   return (
     <p className="text-sm text-[var(--text-secondary)] font-[family-name:var(--font-jetbrains)] tracking-wide">
-      Join{" "}
-      <span className="text-[var(--color-teal)] font-medium tabular-nums">
-        {count.toLocaleString()}
-      </span>{" "}
-      people already waiting
+      {count > 0 ? (
+        <>
+          Join{" "}
+          <span className="text-[var(--color-teal)] font-medium tabular-nums">
+            {count.toLocaleString()}
+          </span>{" "}
+          people already waiting
+        </>
+      ) : (
+        "Be the first to join the waitlist"
+      )}
     </p>
   );
 }

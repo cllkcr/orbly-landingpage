@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,27 +16,116 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500", "700"],
 });
 
+const SITE_URL = "https://orbly.app";
+const TITLE = "Orbly — The first calendar you can feel";
+const DESCRIPTION =
+  "Tasks orbit your Now. Distance shows urgency. The closer it gets, the sooner it's due. Join the waitlist for iOS.";
+
+export const viewport: Viewport = {
+  themeColor: "#0A0A0F",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
-  title: "Orbly — The first calendar you can feel",
-  description:
-    "Tasks orbit your Now. Distance shows urgency. The closer it gets, the sooner it's due. Join the waitlist for iOS.",
-  keywords: ["calendar", "productivity", "iOS", "orbly", "tasks", "waitlist"],
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  keywords: [
+    "calendar app",
+    "productivity",
+    "iOS app",
+    "orbly",
+    "task management",
+    "waitlist",
+    "visual calendar",
+    "time management",
+  ],
+  authors: [{ name: "Orbly" }],
+  creator: "Orbly",
+  publisher: "Orbly",
+
+  // Canonical
+  alternates: {
+    canonical: "/",
+  },
+
+  // Open Graph — image auto-served from src/app/opengraph-image.tsx
   openGraph: {
-    title: "Orbly — The first calendar you can feel",
-    description:
-      "Tasks orbit your Now. Distance shows urgency. Join the waitlist.",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Orbly",
     type: "website",
     locale: "en_US",
-    siteName: "Orbly",
   },
+
+  // Twitter / X — image auto-served from src/app/opengraph-image.tsx
   twitter: {
     card: "summary_large_image",
-    title: "Orbly — The first calendar you can feel",
-    description:
-      "Tasks orbit your Now. Distance shows urgency. Join the waitlist.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
-  robots: { index: true, follow: true },
+
+  // Robots
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  // App links
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Orbly",
+  },
+
+  // Icons
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+
+  // Verification (add your IDs when ready)
+  // verification: {
+  //   google: "your-google-site-verification-id",
+  // },
 };
+
+// JSON-LD structured data for Google
+function JsonLd() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Orbly",
+    applicationCategory: "ProductivityApplication",
+    operatingSystem: "iOS",
+    description: DESCRIPTION,
+    url: SITE_URL,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/PreOrder",
+      description: "Free for founding members for 12 months",
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
 
 export default function RootLayout({
   children,
@@ -48,6 +137,9 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${jetbrains.variable} antialiased`}
     >
+      <head>
+        <JsonLd />
+      </head>
       <body className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-primary)]">
         {children}
       </body>

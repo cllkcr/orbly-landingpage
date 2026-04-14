@@ -3,7 +3,7 @@
 // /ui-ux-pro-max (hero layout, visual hierarchy), /bencium-ux (bold typography, premium feel),
 // /frontend-design (composition, atmosphere)
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
@@ -24,6 +24,16 @@ export default function Hero() {
   const formRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Hide scroll indicator after user scrolls
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY > 80) setScrolled(true);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!headlineRef.current) return;
@@ -128,6 +138,16 @@ export default function Hero() {
 
         <div ref={counterRef}>
           <WaitlistCounter />
+        </div>
+      </div>
+
+      {/* Scroll indicator — fades out after user scrolls */}
+      <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-[fade-in_1s_2s_both] transition-opacity duration-700 ${scrolled ? "opacity-0 pointer-events-none" : ""}`}>
+        <span className="text-[11px] font-[family-name:var(--font-jetbrains)] text-white/30 tracking-widest uppercase">
+          Scroll
+        </span>
+        <div className="w-[1px] h-8 relative overflow-hidden">
+          <div className="absolute inset-x-0 h-full bg-gradient-to-b from-white/40 to-transparent animate-[scroll-line_2s_ease-in-out_infinite]" />
         </div>
       </div>
     </section>

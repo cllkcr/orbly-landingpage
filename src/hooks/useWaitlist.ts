@@ -1,22 +1,27 @@
 "use client";
-// Skills: /react-expert (useSyncExternalStore), /typescript-pro (type inference)
 
-import { useSyncExternalStore, useCallback } from "react";
+import { useSyncExternalStore, useCallback, useEffect } from "react";
 import {
   getWaitlistState,
   subscribe,
   setEmail,
   submitEmail,
+  fetchCount,
 } from "@/lib/store";
 
 export function useWaitlist() {
   const state = useSyncExternalStore(subscribe, getWaitlistState, getWaitlistState);
 
+  // Fetch live count on mount
+  useEffect(() => {
+    fetchCount();
+  }, []);
+
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       if (state.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email)) {
-        submitEmail();
+        await submitEmail();
       }
     },
     [state.email]
