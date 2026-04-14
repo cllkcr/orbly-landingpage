@@ -91,7 +91,7 @@ export default function Problem() {
           className="font-[family-name:var(--font-playfair)] text-[clamp(1.8rem,4.5vw,3rem)]
             leading-[1.15] font-semibold text-[var(--text-dark)] mb-16"
         >
-          Every calendar was built the same way.
+          Every calendar was built the&nbsp;same&nbsp;way.
         </h2>
 
         {/* Calendar grid with strike-through */}
