@@ -147,8 +147,8 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator — fades out after user scrolls */}
-      <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-[fade-in_1s_2s_both] transition-opacity duration-700 ${scrolled ? "opacity-0 pointer-events-none" : ""}`}>
-        <span className="text-[11px] font-[family-name:var(--font-jetbrains)] text-white/30 tracking-widest uppercase">
+      <div aria-hidden="true" className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-[fade-in_1s_2s_both] transition-opacity duration-700 ${scrolled ? "opacity-0 pointer-events-none" : ""}`}>
+        <span className="text-[11px] font-[family-name:var(--font-jetbrains)] text-[var(--text-secondary)] tracking-widest uppercase">
           Scroll
         </span>
         <div className="w-[1px] h-8 relative overflow-hidden">

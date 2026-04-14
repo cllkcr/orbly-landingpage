@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
 const TESTIMONIALS = [
   {
     quote:
-      "I've tried every calendar app. They all made me feel more behind. This one actually shows me what's close.",
+      "I've tried every calendar app. None of them clicked. This one actually shows me what's close.",
     name: "Jamie",
     role: "designer",
     color: "var(--color-teal)",

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { MotionConfig } from "framer-motion";
 import { useLenis } from "@/hooks/useLenis";
 import Hero from "./Hero";
 import Footer from "./Footer";
@@ -17,15 +18,17 @@ export default function PageClient() {
   useLenis();
 
   return (
-    <main>
-      <Hero />
-      <Problem />
-      <FounderNote />
-      <HowItWorks />
-      <SocialProof />
-      <FinalCTA />
-      <Referral />
-      <Footer />
-    </main>
+    <MotionConfig reducedMotion="user">
+      <main>
+        <Hero />
+        <Problem />
+        <FounderNote />
+        <HowItWorks />
+        <SocialProof />
+        <FinalCTA />
+        <Referral />
+        <Footer />
+      </main>
+    </MotionConfig>
   );
 }

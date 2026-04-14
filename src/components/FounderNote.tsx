@@ -8,7 +8,7 @@ export default function FounderNote() {
   return (
     <section className="py-16 md:py-32 bg-[var(--bg-dark)]">
       <div className="max-w-2xl mx-auto px-5 md:px-6">
-        <motion.div
+        <motion.blockquote
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -16,11 +16,11 @@ export default function FounderNote() {
           className="border-l-2 border-[var(--color-teal)]/30 pl-8 md:pl-10"
         >
           <p className="text-lg md:text-xl leading-[1.8] text-[var(--text-secondary)] italic font-[family-name:var(--font-playfair)]">
-            I built Orbly because life kept beating me. Missed tasks. Late to
-            things I cared about. Judged for it. I didn&apos;t need another
+            I built Orbly because I kept losing track of what&apos;s close. Not
+            the hours&nbsp;&mdash; the feeling. I didn&apos;t need another
             list&nbsp;&mdash; I needed something I could feel. So I built it.
           </p>
-        </motion.div>
+        </motion.blockquote>
       </div>
     </section>
   );

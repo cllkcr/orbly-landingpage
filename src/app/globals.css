@@ -53,7 +53,7 @@ body {
 
 ::selection {
   background: rgba(0, 217, 230, 0.25);
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* Lenis */

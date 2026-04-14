@@ -76,6 +76,7 @@ export default function HowItWorks() {
                 hover:border-[var(--color-teal)]/15 transition-colors duration-500"
             >
               <span
+                aria-hidden="true"
                 className="inline-block font-[family-name:var(--font-jetbrains)] text-xs
                   text-[var(--color-teal)]/60 tracking-widest mb-5"
               >

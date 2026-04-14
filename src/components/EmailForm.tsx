@@ -34,7 +34,7 @@ export default function EmailForm({ id }: EmailFormProps) {
               disabled={loading}
               autoComplete="email"
               className="flex-1 px-5 py-3.5 rounded-xl bg-white/[0.06] border border-white/[0.08]
-                text-[15px] text-white placeholder:text-white/30
+                text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]
                 focus:outline-none focus:border-[var(--color-teal)]/40 focus:ring-1 focus:ring-[var(--color-teal)]/20
                 backdrop-blur-sm transition-all duration-300
                 font-[family-name:var(--font-jetbrains)]

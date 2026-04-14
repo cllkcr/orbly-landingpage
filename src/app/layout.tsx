@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   keywords: [
     "calendar app",
-    "productivity",
+    "spatial calendar",
     "iOS app",
     "orbly",
     "task management",

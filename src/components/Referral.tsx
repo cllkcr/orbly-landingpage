@@ -52,14 +52,14 @@ export default function Referral() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <p className="font-[family-name:var(--font-jetbrains)] text-3xl md:text-4xl font-bold text-white mb-2">
+              <p className="font-[family-name:var(--font-jetbrains)] text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
                 #{position?.toLocaleString()}
               </p>
               <p className="text-[var(--text-secondary)] mb-1">
                 on the Orbly waitlist
               </p>
               <p className="text-[var(--color-teal)] font-[family-name:var(--font-jetbrains)] text-sm mt-6 mb-8">
-                Refer 2 friends &rarr; jump 50 spots
+                Share with friends to move up the list
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -68,7 +68,7 @@ export default function Referral() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08]
-                    text-sm text-white hover:bg-white/[0.1] transition-colors inline-flex items-center justify-center gap-2"
+                    text-sm text-[var(--text-primary)] hover:bg-white/[0.1] transition-colors inline-flex items-center justify-center gap-2"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -81,7 +81,7 @@ export default function Referral() {
                 <motion.button
                   onClick={handleCopy}
                   className="px-6 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08]
-                    text-sm text-white hover:bg-white/[0.1] transition-colors cursor-pointer
+                    text-sm text-[var(--text-primary)] hover:bg-white/[0.1] transition-colors cursor-pointer
                     inline-flex items-center justify-center gap-2 min-w-[160px]"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
