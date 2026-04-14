@@ -48,10 +48,13 @@ export default function Hero() {
         type: "words",
       });
 
+      // Reveal h1 container so words can animate in independently
+      gsap.set(headlineRef.current, { visibility: "visible" });
+
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       tl.from(badgeRef.current, {
-        opacity: 0,
+        autoAlpha: 0,
         y: -15,
         duration: 0.6,
         delay: 0.2,
@@ -60,7 +63,7 @@ export default function Hero() {
           split.words,
           {
             y: 60,
-            opacity: 0,
+            autoAlpha: 0,
             filter: "blur(8px)",
             stagger: 0.06,
             duration: 0.8,
@@ -69,17 +72,17 @@ export default function Hero() {
         )
         .from(
           subRef.current,
-          { opacity: 0, y: 20, duration: 0.7 },
+          { autoAlpha: 0, y: 20, duration: 0.7 },
           "-=0.3"
         )
         .from(
           formRef.current,
-          { opacity: 0, y: 25, duration: 0.6 },
+          { autoAlpha: 0, y: 25, duration: 0.6 },
           "-=0.3"
         )
         .from(
           counterRef.current,
-          { opacity: 0, y: 15, duration: 0.5 },
+          { autoAlpha: 0, y: 15, duration: 0.5 },
           "-=0.2"
         );
     }, sectionRef);
@@ -104,6 +107,7 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl mx-auto gap-6 pt-24 pb-16">
         <div
           ref={badgeRef}
+          style={{ visibility: "hidden" }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
             bg-white/[0.06] border border-white/[0.08] backdrop-blur-md"
         >
@@ -116,7 +120,7 @@ export default function Hero() {
         <h1
           ref={headlineRef}
           className="font-[family-name:var(--font-playfair)] text-[clamp(2.2rem,6vw,4.2rem)] leading-[1.1] font-semibold tracking-[-0.02em]"
-          style={{ textShadow: "0 2px 20px rgba(0,0,0,0.8), 0 0px 40px rgba(0,0,0,0.5)" }}
+          style={{ visibility: "hidden", textShadow: "0 2px 20px rgba(0,0,0,0.8), 0 0px 40px rgba(0,0,0,0.5)" }}
         >
           Your calendar shows when.{" "}
           <span className="orbly-gradient">
@@ -127,16 +131,16 @@ export default function Hero() {
         <p
           ref={subRef}
           className="text-lg md:text-xl text-[var(--text-secondary)] max-w-lg leading-relaxed"
-          style={{ textShadow: "0 1px 12px rgba(0,0,0,0.7)" }}
+          style={{ visibility: "hidden", textShadow: "0 1px 12px rgba(0,0,0,0.7)" }}
         >
           The first calendar you can feel. Coming to iOS.
         </p>
 
-        <div ref={formRef} className="w-full mt-2">
+        <div ref={formRef} style={{ visibility: "hidden" }} className="w-full mt-2">
           <EmailForm id="hero-email" />
         </div>
 
-        <div ref={counterRef}>
+        <div ref={counterRef} style={{ visibility: "hidden" }}>
           <WaitlistCounter />
         </div>
       </div>
