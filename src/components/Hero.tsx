@@ -93,7 +93,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden"
     >
       <OrbitScene />
 
@@ -104,7 +104,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-[1] pointer-events-none"
         style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,10,15,0.65) 0%, transparent 70%)" }} />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl mx-auto gap-6 pt-24 pb-16">
+      <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-6 max-w-3xl mx-auto gap-5 md:gap-6 pt-20 md:pt-24 pb-14 md:pb-16">
         <div
           ref={badgeRef}
           style={{ visibility: "hidden" }}

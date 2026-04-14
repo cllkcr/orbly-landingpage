@@ -83,26 +83,26 @@ export default function Problem() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-32 md:py-44 bg-[var(--bg-light)]"
+      className="relative py-20 md:py-44 bg-[var(--bg-light)]"
     >
-      <div className="max-w-3xl mx-auto px-6 text-center">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 text-center">
         <h2
           ref={headingRef}
-          className="font-[family-name:var(--font-playfair)] text-[clamp(1.8rem,4.5vw,3rem)]
-            leading-[1.15] font-semibold text-[var(--text-dark)] mb-16"
+          className="font-[family-name:var(--font-playfair)] text-[clamp(1.6rem,4.5vw,3rem)]
+            leading-[1.15] font-semibold text-[var(--text-dark)] mb-10 md:mb-16"
         >
           Every calendar was built the same way.
         </h2>
 
         {/* Calendar grid with strike-through */}
-        <div className="relative inline-block mb-16">
+        <div className="relative inline-block mb-10 md:mb-16">
           <div ref={gridRef} className="relative">
             {/* Day headers */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
               {DAYS.map((d, i) => (
                 <div
                   key={i}
-                  className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
+                  className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center
                     text-xs font-[family-name:var(--font-jetbrains)] text-[var(--text-dark)]/40 uppercase"
                 >
                   {d}
@@ -111,14 +111,14 @@ export default function Problem() {
             </div>
             {/* Date rows */}
             {DATES.map((week, wi) => (
-              <div key={wi} className="grid grid-cols-7 gap-1">
+              <div key={wi} className="grid grid-cols-7 gap-0.5 sm:gap-1">
                 {week.map((day, di) => {
                   const isOutside =
                     (wi === 0 && day > 20) || (wi === 4 && day < 5);
                   return (
                     <div
                       key={`${wi}-${di}`}
-                      className={`w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
+                      className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center
                         rounded-lg text-sm border border-[var(--text-dark)]/[0.06]
                         ${isOutside ? "text-[var(--text-dark)]/20" : "text-[var(--text-dark)]/60"}`}
                     >

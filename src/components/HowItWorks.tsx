@@ -47,8 +47,8 @@ const cardVariants = {
 
 export default function HowItWorks() {
   return (
-    <section className="py-28 md:py-40 bg-[var(--bg-dark)]">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="py-20 md:py-40 bg-[var(--bg-dark)]">
+      <div className="max-w-5xl mx-auto px-4 md:px-6">
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -59,7 +59,7 @@ export default function HowItWorks() {
           How it works
         </motion.p>
 
-        <div className="grid md:grid-cols-3 gap-5 mt-14">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-5 mt-10 md:mt-14">
           {FEATURES.map((f, i) => (
             <motion.div
               key={i}
@@ -72,7 +72,7 @@ export default function HowItWorks() {
                 y: -6,
                 transition: { type: "spring", stiffness: 400, damping: 20 },
               }}
-              className="group p-7 md:p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06]
+              className="group p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06]
                 hover:border-[var(--color-teal)]/15 transition-colors duration-500"
             >
               <span
@@ -81,7 +81,7 @@ export default function HowItWorks() {
               >
                 {f.icon}
               </span>
-              <h3 className="font-[family-name:var(--font-playfair)] text-xl md:text-2xl font-semibold mb-3 text-white">
+              <h3 className="font-[family-name:var(--font-playfair)] text-xl md:text-2xl font-semibold mb-3 text-[var(--text-primary)]">
                 {f.title}
               </h3>
               <p className="text-[var(--text-secondary)] leading-relaxed text-[15px]">

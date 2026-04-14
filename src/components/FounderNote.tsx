@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 
 export default function FounderNote() {
   return (
-    <section className="py-24 md:py-32 bg-[var(--bg-dark)]">
-      <div className="max-w-2xl mx-auto px-6">
+    <section className="py-16 md:py-32 bg-[var(--bg-dark)]">
+      <div className="max-w-2xl mx-auto px-5 md:px-6">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}

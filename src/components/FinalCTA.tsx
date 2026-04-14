@@ -41,7 +41,7 @@ export default function FinalCTA() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-28 md:py-40 bg-[var(--bg-dark)] overflow-hidden">
+    <section ref={sectionRef} className="relative py-20 md:py-40 bg-[var(--bg-dark)] overflow-hidden">
       {/* Subtle radial glow */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]
@@ -52,7 +52,7 @@ export default function FinalCTA() {
         }}
       />
 
-      <div className="relative max-w-2xl mx-auto px-6 text-center">
+      <div className="relative max-w-2xl mx-auto px-5 md:px-6 text-center">
         <p className="font-[family-name:var(--font-jetbrains)] text-xs tracking-[0.2em] uppercase text-[var(--color-teal)] mb-6 opacity-60">
           For founding members
         </p>

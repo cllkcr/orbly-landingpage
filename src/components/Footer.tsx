@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="py-16 bg-[var(--bg-dark)] border-t border-white/[0.04]">
       <div className="max-w-lg mx-auto px-6 text-center space-y-6">
-        <p className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-white">
+        <p className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--text-primary)]">
           Orbly
         </p>
 
