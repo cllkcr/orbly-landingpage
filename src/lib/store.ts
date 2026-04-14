@@ -38,17 +38,25 @@ export function setEmail(email: string) {
   emit();
 }
 
-// Fetch live count from API on page load
+// Deduplicate — only one in-flight fetch regardless of how many components mount
+let fetchDone = false;
+let fetchInProgress = false;
+
 export async function fetchCount() {
+  if (fetchDone || fetchInProgress) return;
+  fetchInProgress = true;
   try {
     const res = await fetch("/api/waitlist");
     if (res.ok) {
-      const data = await res.json();
+      const data = await res.json() as { count: number };
       state = { ...state, count: data.count };
       emit();
+      fetchDone = true;
     }
   } catch {
     // Silently keep default count
+  } finally {
+    fetchInProgress = false;
   }
 }
 

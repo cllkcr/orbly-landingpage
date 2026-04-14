@@ -53,8 +53,8 @@ export default function FinalCTA() {
       />
 
       <div className="relative max-w-2xl mx-auto px-6 text-center">
-        <p className="font-[family-name:var(--font-jetbrains)] text-xs tracking-[0.2em] uppercase text-[var(--color-coral)] mb-6">
-          Don&apos;t miss your free year
+        <p className="font-[family-name:var(--font-jetbrains)] text-xs tracking-[0.2em] uppercase text-[var(--color-teal)] mb-6 opacity-60">
+          For founding members
         </p>
 
         <h2
@@ -62,7 +62,7 @@ export default function FinalCTA() {
           className="font-[family-name:var(--font-playfair)] text-[clamp(2rem,5vw,3.5rem)]
             leading-[1.1] font-semibold mb-6"
         >
-          Get Orbly free for a year.
+          A full year, on us.
         </h2>
 
         <p className="font-[family-name:var(--font-jetbrains)] text-xs text-[var(--text-secondary)] tracking-wide mb-6 flex flex-wrap justify-center gap-x-4 gap-y-1">
@@ -71,14 +71,11 @@ export default function FinalCTA() {
           <span>12 months free</span>
           <span>&middot;</span>
           <span>No card required</span>
-          <span>&middot;</span>
-          <span>Closes at launch</span>
         </p>
 
         <p className="text-[var(--text-secondary)] text-[16px] leading-relaxed max-w-lg mx-auto mb-10">
-          Join the waitlist now and get Orbly completely free for one full year.
-          No card. No catch. Just you, your orbit, and 12 months on us. This
-          offer closes at launch.
+          Early members get Orbly free for a full year. No card, no catch.
+          Just you, your orbit, and time that finally makes sense.
         </p>
 
         <EmailForm id="cta-email" />
