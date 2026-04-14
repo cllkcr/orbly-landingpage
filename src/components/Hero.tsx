@@ -133,7 +133,8 @@ export default function Hero() {
           className="text-lg md:text-xl text-[var(--text-secondary)] max-w-lg leading-relaxed"
           style={{ visibility: "hidden", textShadow: "0 1px 12px rgba(0,0,0,0.7)" }}
         >
-          The first calendar you can feel. Coming to iOS.
+          The first calendar you can feel.{" "}
+          <span className="whitespace-nowrap">Coming to iOS.</span>
         </p>
 
         <div ref={formRef} style={{ visibility: "hidden" }} className="w-full mt-2">
