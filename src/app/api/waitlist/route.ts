@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 const SEED_COUNT = 0;
@@ -8,18 +8,26 @@ const KEYS = {
   entries: "orbly:waitlist:entries",
 };
 
+function getRedis() {
+  const url =
+    process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token =
+    process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) throw new Error("Redis not configured");
+  return new Redis({ url, token });
+}
+
 // GET — return current waitlist count
 export async function GET() {
   try {
+    const kv = getRedis();
     let count = await kv.get<number>(KEYS.count);
     if (count === null) {
-      // Seed on first request
       await kv.set(KEYS.count, SEED_COUNT);
       count = SEED_COUNT;
     }
     return NextResponse.json({ count });
   } catch {
-    // Fallback if KV not configured (local dev)
     return NextResponse.json({ count: SEED_COUNT });
   }
 }
@@ -27,6 +35,7 @@ export async function GET() {
 // POST — add email to waitlist
 export async function POST(req: NextRequest) {
   try {
+    const kv = getRedis();
     const body = await req.json();
     const email = (body.email || "").trim().toLowerCase();
 
@@ -58,7 +67,6 @@ export async function POST(req: NextRequest) {
     // Add to set + sorted set + increment counter
     await kv.sadd(KEYS.emails, email);
 
-    // Ensure count is seeded
     let count = await kv.get<number>(KEYS.count);
     if (count === null) {
       await kv.set(KEYS.count, SEED_COUNT);
