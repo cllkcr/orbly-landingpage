@@ -54,7 +54,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       html(
         "Invalid link",
         "This unsubscribe link is missing a token.",
-        '<a href="https://orbly.app">← orbly.app</a>'
+        '<a href="https://orblyapp.com">← orblyapp.com</a>'
       ),
       { status: 400, headers: { "Content-Type": "text/html" } }
     );
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         html(
           "Already unsubscribed",
           "You're not receiving emails from us.",
-          '<a href="https://orbly.app">← orbly.app</a>'
+          '<a href="https://orblyapp.com">← orblyapp.com</a>'
         ),
         { status: 200, headers: { "Content-Type": "text/html" } }
       );

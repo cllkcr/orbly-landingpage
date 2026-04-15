@@ -23,7 +23,7 @@ const inter = Inter({
   weight: ["300", "400", "500"],
 });
 
-const SITE_URL = "https://orbly.app";
+const SITE_URL = "https://orblyapp.com";
 const TITLE =
   "Orbly — The first AI powered app that makes time something you can feel, not just read.";
 const DESCRIPTION =

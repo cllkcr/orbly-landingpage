@@ -51,7 +51,7 @@ async function sendFounderEmail(params: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM ?? "Orbly <notifications@orbly.app>",
+      from: process.env.RESEND_FROM ?? "Orbly <notifications@orblyapp.com>",
       to: [to],
       subject: params.subject,
       html: params.html,
@@ -98,8 +98,8 @@ async function sendWelcomeEmail(params: {
   const key = process.env.RESEND_API_KEY;
   if (!key) return;
   const { email, position, referralCode, unsubToken } = params;
-  const referralUrl = `https://orbly.app/?ref=${referralCode}`;
-  const unsubUrl = `https://orbly.app/api/v2/unsubscribe?token=${unsubToken}`;
+  const referralUrl = `https://orblyapp.com/?ref=${referralCode}`;
+  const unsubUrl = `https://orblyapp.com/api/v2/unsubscribe?token=${unsubToken}`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -139,7 +139,7 @@ async function sendWelcomeEmail(params: {
           <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 20px;">
           <p style="margin:0;font-size:12px;color:#999;line-height:1.6;">
             No spam. <a href="${unsubUrl}" style="color:#999;text-decoration:underline;">Unsubscribe anytime.</a><br>
-            Orbly · orbly.app
+            Orbly · orblyapp.com
           </p>
         </td></tr>
       </table>

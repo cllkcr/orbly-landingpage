@@ -56,7 +56,7 @@ export default function ReferralCard({
   const isSuccess = state.status === "success";
   const referralCode = isSuccess ? state.referralCode : "";
 
-  const shareUrl = `https://orbly.app/?ref=${referralCode}`;
+  const shareUrl = `https://orblyapp.com/?ref=${referralCode}`;
   const shareText = `I just joined the Orbly waitlist — the first calendar you can feel. Check it out:`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     shareText
