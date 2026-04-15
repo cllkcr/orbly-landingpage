@@ -6,6 +6,7 @@ import type {
   SignupState,
   V2ApiSuccessResponse,
   V2CountResponse,
+  V2PositionResponse,
 } from "@/app/v2/types";
 
 type Listener = () => void;
@@ -64,6 +65,54 @@ export async function fetchV2Count() {
   }
 }
 
+// ── Referral position polling (singleton) ──────────────────
+// Started on first successful submit. Lives for the page lifetime so that
+// multiple mounted consumers (Hero + FinalCTA ReferralCards) share a single
+// 30s poll instead of each running their own.
+const POLL_INTERVAL_MS = 30_000;
+let pollIntervalId: ReturnType<typeof setInterval> | null = null;
+
+async function pollV2Position() {
+  if (state.signup.status !== "success") return;
+  const { referralCode } = state.signup;
+  try {
+    const res = await fetch(
+      `/api/v2/position?code=${encodeURIComponent(referralCode)}`
+    );
+    if (!res.ok) return;
+    const data = (await res.json()) as V2PositionResponse;
+    // Bail if state transitioned during the fetch
+    if (state.signup.status !== "success") return;
+    // Only emit if something actually changed — avoids spurious renders
+    const prev = state.signup;
+    if (
+      prev.position === data.position &&
+      prev.referralCount === data.referralCount &&
+      prev.tier === data.tier
+    ) {
+      return;
+    }
+    state = {
+      ...state,
+      signup: {
+        ...prev,
+        position: data.position,
+        referralCount: data.referralCount,
+        tier: data.tier,
+      },
+    };
+    emit();
+  } catch {
+    // silent — transient network error; next tick retries
+  }
+}
+
+function startV2ReferralPoll() {
+  if (pollIntervalId) return;
+  if (typeof window === "undefined") return;
+  pollIntervalId = setInterval(pollV2Position, POLL_INTERVAL_MS);
+}
+
 export async function submitV2Email(
   email: string,
   refCode?: string
@@ -116,6 +165,7 @@ export async function submitV2Email(
       count: success.count,
     };
     emit();
+    startV2ReferralPoll();
     return true;
   } catch {
     state = {

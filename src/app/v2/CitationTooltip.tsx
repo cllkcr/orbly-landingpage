@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
@@ -18,7 +19,19 @@ interface CitationTooltipProps {
   label?: string;
 }
 
+// Viewport constants
 const VIEWPORT_TOP_MARGIN = 80;
+const VIEWPORT_SIDE_GUTTER = 12;
+const TOOLTIP_MAX_WIDTH = 240;
+const TOOLTIP_MIN_WIDTH = 160;
+const ARROW_EDGE_SAFE = 12; // keep tail at least this far from tooltip's left/right
+
+interface Position {
+  placement: Placement;
+  leftPx: number; // tooltip left in parent-local coords
+  arrowPx: number; // tail left in tooltip-local coords
+  maxWidth: number;
+}
 
 export default function CitationTooltip({
   children,
@@ -29,10 +42,15 @@ export default function CitationTooltip({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
-  const [placement, setPlacement] = useState<Placement>("top");
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [pos, setPos] = useState<Position>({
+    placement: "top",
+    leftPx: 0,
+    arrowPx: TOOLTIP_MAX_WIDTH / 2,
+    maxWidth: TOOLTIP_MAX_WIDTH,
+  });
 
-  // Detect reduced motion preference once.
+  // Detect reduced motion preference once, with a live listener.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -42,18 +60,50 @@ export default function CitationTooltip({
     return () => mq.removeEventListener("change", listener);
   }, []);
 
-  const computePlacement = useCallback(() => {
-    const el = triggerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    // If the trigger is too close to the viewport top, flip below.
-    setPlacement(rect.top < VIEWPORT_TOP_MARGIN ? "bottom" : "top");
+  // Compute both vertical placement AND horizontal clamp so the tooltip never
+  // overflows the viewport on narrow screens or near-edge triggers. The tail
+  // is re-anchored so it still points at the trigger's true center even when
+  // the tooltip has been shifted inward.
+  const computePosition = useCallback(() => {
+    const trigger = triggerRef.current;
+    const container = containerRef.current;
+    if (!trigger || !container || typeof window === "undefined") return;
+
+    const vw = window.innerWidth;
+    const triggerRect = trigger.getBoundingClientRect();
+    const parentLeft = container.getBoundingClientRect().left;
+
+    // Available width (respect gutters); tooltip can shrink below max when
+    // viewport is very narrow.
+    const available = Math.max(
+      TOOLTIP_MIN_WIDTH,
+      vw - VIEWPORT_SIDE_GUTTER * 2
+    );
+    const tooltipWidth = Math.min(TOOLTIP_MAX_WIDTH, available);
+
+    const placement: Placement =
+      triggerRect.top < VIEWPORT_TOP_MARGIN ? "bottom" : "top";
+
+    const triggerCenterX = triggerRect.left + triggerRect.width / 2;
+    const desiredLeft = triggerCenterX - tooltipWidth / 2;
+    const clampedLeft = Math.max(
+      VIEWPORT_SIDE_GUTTER,
+      Math.min(desiredLeft, vw - VIEWPORT_SIDE_GUTTER - tooltipWidth)
+    );
+
+    const leftPx = clampedLeft - parentLeft;
+    const arrowPx = Math.max(
+      ARROW_EDGE_SAFE,
+      Math.min(triggerCenterX - clampedLeft, tooltipWidth - ARROW_EDGE_SAFE)
+    );
+
+    setPos({ placement, leftPx, arrowPx, maxWidth: tooltipWidth });
   }, []);
 
   const show = useCallback(() => {
-    computePlacement();
+    computePosition();
     setOpen(true);
-  }, [computePlacement]);
+  }, [computePosition]);
 
   const hide = useCallback(() => setOpen(false), []);
   const toggle = useCallback(() => {
@@ -64,7 +114,14 @@ export default function CitationTooltip({
     }
   }, [open, show, hide]);
 
-  // Escape closes the tooltip; tap-outside closes on touch.
+  // Recompute synchronously after the tooltip mounts so its position is
+  // correct on first paint (no flicker during the fade-in).
+  useLayoutEffect(() => {
+    if (!open) return;
+    computePosition();
+  }, [open, computePosition]);
+
+  // Escape closes; pointerdown outside closes for touch users.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -87,25 +144,23 @@ export default function CitationTooltip({
     };
   }, [open]);
 
-  // Re-compute placement on scroll/resize while open.
+  // Re-compute position on scroll/resize while open.
   useEffect(() => {
     if (!open) return;
-    const onChange = () => computePlacement();
+    const onChange = () => computePosition();
     window.addEventListener("scroll", onChange, { passive: true });
     window.addEventListener("resize", onChange);
     return () => {
       window.removeEventListener("scroll", onChange);
       window.removeEventListener("resize", onChange);
     };
-  }, [open, computePlacement]);
+  }, [open, computePosition]);
 
-  const offsetClasses =
-    placement === "top"
-      ? "bottom-full mb-2"
-      : "top-full mt-2";
-
+  const offsetClasses = pos.placement === "top" ? "bottom-full mb-2" : "top-full mt-2";
   const slideY =
-    placement === "top" ? { closed: 0, open: -4 } : { closed: 0, open: 4 };
+    pos.placement === "top"
+      ? { closed: 0, open: -4 }
+      : { closed: 0, open: 4 };
 
   return (
     <span ref={containerRef} className="relative inline">
@@ -157,13 +212,16 @@ export default function CitationTooltip({
             exit={
               reducedMotion
                 ? { opacity: 0 }
-                : { opacity: 0, y: slideY.closed, transition: { duration: 0.12 } }
+                : {
+                    opacity: 0,
+                    y: slideY.closed,
+                    transition: { duration: 0.12 },
+                  }
             }
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className={`
-              absolute left-1/2 -translate-x-1/2 ${offsetClasses}
+              absolute ${offsetClasses}
               z-50 pointer-events-none
-              w-max max-w-[240px]
               px-3 py-2 rounded-xl
               backdrop-blur-md
               font-[family-name:var(--font-jetbrains)]
@@ -173,6 +231,9 @@ export default function CitationTooltip({
               select-none
             `}
             style={{
+              left: `${pos.leftPx}px`,
+              width: "max-content",
+              maxWidth: `${pos.maxWidth}px`,
               background: "rgba(10,10,15,0.95)",
               border: "1px solid rgba(255,255,255,0.08)",
               boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -184,31 +245,34 @@ export default function CitationTooltip({
             >
               {label}
             </span>
-            <span className="block text-[var(--text-primary)]">{citation}</span>
+            <span className="block text-[var(--text-primary)]">
+              {citation}
+            </span>
 
-            {/* Pointer tail */}
+            {/* Pointer tail — anchored to trigger center, not tooltip center */}
             <span
               aria-hidden="true"
-              className={`
-                absolute left-1/2 -translate-x-1/2 w-2 h-2 rotate-45
-                ${placement === "top" ? "-bottom-1" : "-top-1"}
-              `}
+              className={`absolute w-2 h-2 ${
+                pos.placement === "top" ? "-bottom-1" : "-top-1"
+              }`}
               style={{
+                left: `${pos.arrowPx}px`,
+                transform: "translateX(-50%) rotate(45deg)",
                 background: "rgba(10,10,15,0.95)",
                 borderRight:
-                  placement === "top"
+                  pos.placement === "top"
                     ? "1px solid rgba(255,255,255,0.08)"
                     : "none",
                 borderBottom:
-                  placement === "top"
+                  pos.placement === "top"
                     ? "1px solid rgba(255,255,255,0.08)"
                     : "none",
                 borderLeft:
-                  placement === "bottom"
+                  pos.placement === "bottom"
                     ? "1px solid rgba(255,255,255,0.08)"
                     : "none",
                 borderTop:
-                  placement === "bottom"
+                  pos.placement === "bottom"
                     ? "1px solid rgba(255,255,255,0.08)"
                     : "none",
               }}

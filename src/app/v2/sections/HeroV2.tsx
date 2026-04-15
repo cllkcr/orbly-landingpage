@@ -182,8 +182,8 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
             textShadow: "0 1px 16px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.75)",
           }}
         >
-          See what&apos;s coming. Feel what&apos;s close.{" "}
-          <span className="whitespace-nowrap">Let Orbly handle the rest.</span>
+          The first AI powered app that makes time something you can feel, not
+          just read.
         </p>
 
         {/* Form */}

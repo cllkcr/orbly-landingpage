@@ -1,12 +1,16 @@
 import type { MetadataRoute } from "next";
 
+const SITE_URL = "https://orbly.app";
+
 export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+
   return [
     {
-      url: "https://orbly.app",
-      lastModified: new Date(),
+      url: SITE_URL,
+      lastModified,
       changeFrequency: "weekly",
-      priority: 1,
+      priority: 1.0,
     },
   ];
 }

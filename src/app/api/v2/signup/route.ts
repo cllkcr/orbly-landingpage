@@ -32,7 +32,13 @@ function computeTier(count: number): ReferralTier {
   return "none";
 }
 
-async function notifyFounder(referrerEmail: string): Promise<void> {
+// Shared Resend delivery. Silently no-ops when env vars missing, so the
+// signup flow still works without email configured. Returns void — callers
+// should either await (reliable delivery) or fire-and-forget.
+async function sendFounderEmail(params: {
+  subject: string;
+  html: string;
+}): Promise<void> {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.FOUNDER_EMAIL;
   if (!key || !to) return;
@@ -45,11 +51,45 @@ async function notifyFounder(referrerEmail: string): Promise<void> {
     body: JSON.stringify({
       from: process.env.RESEND_FROM ?? "Orbly <notifications@orbly.app>",
       to: [to],
-      subject: "Orbly — new founding member (10 referrals)",
-      html: `<p><strong>${referrerEmail}</strong> just reached 10 referrals and earned a one-on-one onboarding call.</p>`,
+      subject: params.subject,
+      html: params.html,
     }),
   }).catch(() => {
     // non-blocking — don't fail signup if email fails
+  });
+}
+
+// Fires on every fresh reservation — NOT on duplicates, so re-submits don't
+// spam the inbox. Called fire-and-forget via void so signup latency is not
+// tied to Resend response time.
+async function notifyNewSignup(params: {
+  email: string;
+  position: number;
+  totalCount: number;
+  referredBy: string | null;
+}): Promise<void> {
+  const { email, position, totalCount, referredBy } = params;
+  const sourceLine = referredBy
+    ? `<p><strong>Source:</strong> referral — code <code>${referredBy}</code></p>`
+    : `<p><strong>Source:</strong> direct</p>`;
+  await sendFounderEmail({
+    subject: `Orbly — new signup #${position}: ${email}`,
+    html: `
+      <p><strong>${email}</strong> just reserved a spot on the waitlist.</p>
+      <p><strong>Position:</strong> #${position}</p>
+      <p><strong>Total waitlist:</strong> ${totalCount.toLocaleString()}</p>
+      ${sourceLine}
+      <p style="color:#888;font-size:12px;margin-top:16px">${new Date().toISOString()}</p>
+    `,
+  });
+}
+
+// Fires when a referrer first hits the 10-friend tier. Separate from
+// notifyNewSignup because this is a rarer, higher-signal event.
+async function notifyFounderTier(referrerEmail: string): Promise<void> {
+  await sendFounderEmail({
+    subject: "Orbly — new founding member (10 referrals)",
+    html: `<p><strong>${referrerEmail}</strong> just reached 10 referrals and earned a one-on-one onboarding call.</p>`,
   });
 }
 
@@ -151,9 +191,10 @@ export async function POST(
         await kv.zincrby(KEYS.entries, -50, referrerEmail);
         // Double-sided reward: new user gets -10 bonus
         await kv.zincrby(KEYS.entries, -10, email);
-        // Notify founder when referrer first reaches 'call' tier
+        // Notify founder when referrer first reaches 'call' tier. Fire-and-
+        // forget — signup latency should not depend on Resend.
         if (newTier === "call" && prevTier !== "call") {
-          await notifyFounder(referrerEmail);
+          void notifyFounderTier(referrerEmail);
         }
       }
     }
@@ -163,13 +204,25 @@ export async function POST(
       kv.get<number>(KEYS.v1count),
       kv.get<number>(KEYS.count),
     ]);
+    const totalCount = (v1Final ?? 0) + (v2Final ?? 0);
+
+    // Email founder for every new signup. Fire-and-forget — Resend is fast
+    // enough that the function stays alive long enough to complete on Vercel
+    // Fluid / serverless. If delivery ever becomes flaky, upgrade to
+    // `after()` from next/server to guarantee post-response work.
+    void notifyNewSignup({
+      email,
+      position,
+      totalCount,
+      referredBy: refCode,
+    });
 
     return NextResponse.json({
       position,
       referralCode,
       referralCount: 0,
       tier: "none",
-      count: (v1Final ?? 0) + (v2Final ?? 0),
+      count: totalCount,
     });
   } catch (err) {
     console.error("[v2/signup] error:", err);

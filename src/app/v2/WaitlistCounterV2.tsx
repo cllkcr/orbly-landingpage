@@ -79,27 +79,13 @@ export default function WaitlistCounterV2() {
   };
 
   const baseClass =
-    "inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] " +
+    "text-sm text-[var(--text-secondary)] text-center " +
     "font-[family-name:var(--font-jetbrains)] tracking-wide tabular-nums";
-
-  // Small teal "live" dot — uses a CSS var, static (no animate-pulse),
-  // respects the premium aesthetic.
-  const LiveDot = () => (
-    <span
-      aria-hidden="true"
-      className="inline-block h-1.5 w-1.5 rounded-full shrink-0"
-      style={{
-        background: "var(--color-teal)",
-        boxShadow: "0 0 8px var(--color-teal)",
-      }}
-    />
-  );
 
   if (copy.kind === "empty") {
     return (
       <p className={baseClass} style={shadow} aria-live="polite">
-        <LiveDot />
-        <span>Be the first to reserve your spot</span>
+        Be the first to reserve your spot
       </p>
     );
   }
@@ -107,36 +93,30 @@ export default function WaitlistCounterV2() {
   if (copy.kind === "early") {
     return (
       <p className={baseClass} style={shadow}>
-        <LiveDot />
-        <span>
-          You&apos;re among the first{" "}
-          <span
-            ref={numRef}
-            aria-live="polite"
-            className="text-[var(--text-primary)] font-medium"
-          >
-            {copy.count.toLocaleString()}
-          </span>{" "}
-          reserving early access
-        </span>
+        You&apos;re among the first{" "}
+        <span
+          ref={numRef}
+          aria-live="polite"
+          className="text-[var(--text-primary)] font-medium"
+        >
+          {copy.count.toLocaleString()}
+        </span>{" "}
+        reserving early access
       </p>
     );
   }
 
   return (
     <p className={baseClass} style={shadow}>
-      <LiveDot />
-      <span>
-        Join{" "}
-        <span
-          ref={numRef}
-          aria-live="polite"
-          className="text-[var(--text-primary)] font-medium"
-        >
-          0
-        </span>{" "}
-        people already reserving their spot
-      </span>
+      Join{" "}
+      <span
+        ref={numRef}
+        aria-live="polite"
+        className="text-[var(--text-primary)] font-medium"
+      >
+        0
+      </span>{" "}
+      people already reserving their spot
     </p>
   );
 }

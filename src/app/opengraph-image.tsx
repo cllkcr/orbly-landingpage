@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-export const alt = "Orbly — Your brain lives in the now";
+export const alt =
+  "Orbly — Your brain lives in the now. The first AI-powered spatial calendar for iOS.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -155,9 +155,12 @@ export default async function Image() {
               fontSize: "22px",
               color: "rgba(232,232,240,0.55)",
               letterSpacing: "0.02em",
+              lineHeight: 1.35,
+              maxWidth: "540px",
+              display: "block",
             }}
           >
-            See what&apos;s coming. Feel what&apos;s close.
+            The first AI powered app that makes time something you can feel.
           </span>
 
           {/* CTA row */}
