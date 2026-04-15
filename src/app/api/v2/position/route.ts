@@ -30,7 +30,7 @@ export async function GET(
     }
 
     // True list rank (0-indexed ascending), convert to 1-indexed position
-    const [rank, userData] = await Promise.all([
+    const [rank, userData, v1count] = await Promise.all([
       kv.zrank("orbly:v2:entries", email),
       kv.hgetall<{
         code: string;
@@ -38,10 +38,16 @@ export async function GET(
         tier: ReferralTier;
         position: string;
       }>(`orbly:v2:user:${email}`),
+      kv.get<number>("orbly:waitlist:count"),
     ]);
 
+    // v1count offsets all v2 positions so rank reflects the full combined list
+    const v1offset = v1count ?? 0;
+    const combinedPosition =
+      rank !== null ? v1offset + rank + 1 : Number(userData?.position ?? 0);
+
     return NextResponse.json({
-      position: rank !== null ? rank + 1 : Number(userData?.position ?? 0),
+      position: combinedPosition,
       referralCount: userData?.count ? Number(userData.count) : 0,
       tier: userData?.tier ?? "none",
       referralCode: code,

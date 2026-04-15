@@ -275,11 +275,15 @@ export async function POST(
 
     // Add email + generate position
     await kv.sadd(KEYS.emails, email);
-    const position = await kv.incr(KEYS.count);
+    const v2position = await kv.incr(KEYS.count);
     const referralCode = nanoid(8);
 
-    // Store in sorted set (score = position)
-    await kv.zadd(KEYS.entries, { score: position, member: email });
+    // Fetch v1 count to compute real combined position
+    const v1countForPosition = (await kv.get<number>(KEYS.v1count)) ?? 0;
+    const position = v1countForPosition + v2position;
+
+    // Store in sorted set (score = v2 position for relative ordering)
+    await kv.zadd(KEYS.entries, { score: v2position, member: email });
     // Map code → email
     await kv.set(KEYS.ref(referralCode), email);
     // User hash — full schema
