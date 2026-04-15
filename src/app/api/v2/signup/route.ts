@@ -133,7 +133,7 @@ async function sendWelcomeEmail(params: {
           </table>
           <p style="margin:0 0 16px;">Every friend you refer also gets founding pricing, so you're not just helping yourself.</p>
           <p style="margin:0 0 16px;">I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.</p>
-          <p style="margin:0 0 24px;">Not a bad deal, right? :)</p>
+          <p style="margin:0 0 24px;">Catch you on the other side.</p>
           <p style="margin:0 0 4px;">Love,</p>
           <p style="margin:0 0 40px;font-weight:600;">Celal</p>
           <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 20px;">
@@ -169,7 +169,7 @@ Every friend you refer also gets founding pricing, so you're not just helping yo
 
 I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.
 
-Not a bad deal, right? :)
+Catch you on the other side.
 
 Love,
 Celal
