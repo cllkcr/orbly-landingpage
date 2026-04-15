@@ -187,7 +187,7 @@ No spam. Unsubscribe anytime: ${unsubUrl}`;
       from: "Celal from Orbly <celal@orblyapp.com>",
       to: [email],
       reply_to: ["celal@orblyapp.com"],
-      subject: `You're #${position} on the Orbly waitlist`,
+      subject: "This actually means a lot, thank you.",
       html,
       text,
       headers: {
