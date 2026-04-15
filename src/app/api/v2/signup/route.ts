@@ -1,5 +1,5 @@
 import { Redis } from "@upstash/redis";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { nanoid } from "nanoid";
 import type {
   V2ApiSuccessResponse,
@@ -56,14 +56,13 @@ async function sendFounderEmail(params: {
       subject: params.subject,
       html: params.html,
     }),
-  }).catch(() => {
-    // non-blocking — don't fail signup if email fails
+  }).catch((err) => {
+    console.error("[v2/signup] sendFounderEmail failed:", err);
   });
 }
 
 // Fires on every fresh reservation — NOT on duplicates, so re-submits don't
-// spam the inbox. Called fire-and-forget via void so signup latency is not
-// tied to Resend response time.
+// spam the inbox.
 async function notifyNewSignup(params: {
   email: string;
   position: number;
@@ -96,7 +95,10 @@ async function sendWelcomeEmail(params: {
   unsubToken: string;
 }): Promise<void> {
   const key = process.env.RESEND_API_KEY;
-  if (!key) return;
+  if (!key) {
+    console.error("[v2/signup] sendWelcomeEmail: RESEND_API_KEY is not set");
+    return;
+  }
   const { email, position, referralCode, unsubToken } = params;
   const referralUrl = `https://orblyapp.com/?ref=${referralCode}`;
   const unsubUrl = `https://orblyapp.com/api/v2/unsubscribe?token=${unsubToken}`;
@@ -195,8 +197,8 @@ No spam. Unsubscribe anytime: ${unsubUrl}`;
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     }),
-  }).catch(() => {
-    // non-blocking — don't fail signup if welcome email fails
+  }).catch((err) => {
+    console.error("[v2/signup] sendWelcomeEmail failed:", err);
   });
 }
 
@@ -315,10 +317,11 @@ export async function POST(
         await kv.zincrby(KEYS.entries, -50, referrerEmail);
         // Double-sided reward: new user gets -10 bonus
         await kv.zincrby(KEYS.entries, -10, email);
-        // Notify founder when referrer first reaches 'call' tier. Fire-and-
-        // forget — signup latency should not depend on Resend.
+        // Notify founder when referrer first reaches 'call' tier.
+        // Scheduled with after() so it runs after the response is sent
+        // and is guaranteed to complete (not killed by Vercel's 10s limit).
         if (newTier === "call" && prevTier !== "call") {
-          void notifyFounderTier(referrerEmail);
+          after(() => notifyFounderTier(referrerEmail));
         }
       }
     }
@@ -330,21 +333,26 @@ export async function POST(
     ]);
     const totalCount = (v1Final ?? 0) + (v2Final ?? 0);
 
-    // Fire both emails concurrently. Both are fire-and-forget so signup
-    // response latency is not tied to Resend. Welcome email goes to the user,
-    // notify email goes to the founder.
-    void notifyNewSignup({
-      email,
-      position,
-      totalCount,
-      referredBy: refCode,
-    });
-    void sendWelcomeEmail({
-      email,
-      position,
-      referralCode,
-      unsubToken,
-    });
+    // Schedule both emails to run after the response is sent.
+    // after() is guaranteed by Next.js / Vercel to complete even after the
+    // serverless function's response is flushed — this fixes the bug where
+    // fire-and-forget (void) tasks were being killed before Resend responded.
+    after(() =>
+      notifyNewSignup({
+        email,
+        position,
+        totalCount,
+        referredBy: refCode,
+      })
+    );
+    after(() =>
+      sendWelcomeEmail({
+        email,
+        position,
+        referralCode,
+        unsubToken,
+      })
+    );
 
     return NextResponse.json({
       position,
