@@ -15,6 +15,8 @@ const KEYS = {
   ref: (code: string) => `orbly:v2:ref:${code}`,
   user: (email: string) => `orbly:v2:user:${email}`,
   rate: (ip: string) => `orbly:v2:rate:${ip}`,
+  unsub: (token: string) => `orbly:v2:unsub:${token}`,
+  unsubscribed: "orbly:v2:unsubscribed",
 };
 
 function getRedis() {
@@ -81,6 +83,120 @@ async function notifyNewSignup(params: {
       ${sourceLine}
       <p style="color:#888;font-size:12px;margin-top:16px">${new Date().toISOString()}</p>
     `,
+  });
+}
+
+// Sends a personal welcome email to the person who just joined.
+// Plain-text-style HTML so it reads like a real founder email, not a
+// marketing blast. Includes referral link + one-click unsubscribe.
+async function sendWelcomeEmail(params: {
+  email: string;
+  position: number;
+  referralCode: string;
+  unsubToken: string;
+}): Promise<void> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  const { email, position, referralCode, unsubToken } = params;
+  const referralUrl = `https://orbly.app/?ref=${referralCode}`;
+  const unsubUrl = `https://orbly.app/api/v2/unsubscribe?token=${unsubToken}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;">
+    <tr><td align="center" style="padding:40px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr><td style="padding-bottom:32px;">
+          <span style="font-size:22px;font-weight:700;color:#0A0A0F;letter-spacing:-0.5px;">Orbly</span>
+        </td></tr>
+        <tr><td style="color:#1a1a1a;font-size:16px;line-height:1.7;">
+          <p style="margin:0 0 16px;">Hey,</p>
+          <p style="margin:0 0 16px;">You made it. You're <strong style="color:#0A0A0F;">#${position}</strong> on the Orbly waitlist.</p>
+          <p style="margin:0 0 16px;">I'm still very early in this, but that's exactly why having you here means a lot to me.</p>
+          <p style="margin:0 0 8px;font-weight:600;color:#0A0A0F;">Here's what you've locked in:</p>
+          <p style="margin:0 0 16px;">Free during beta. When Orbly launches publicly, your founding price is yours forever. No matter what we charge everyone else, no matter how long it takes.</p>
+          <p style="margin:0 0 12px;">Want to move up the list? Share your link with people you think would genuinely find this useful:</p>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;width:100%;">
+            <tr><td style="padding:12px 16px;background:#f5f5f7;border-radius:8px;font-size:15px;line-height:1.8;">
+              Refer 2 friends → Jump 50 spots<br>
+              Refer 5 friends → 3 extra months free on top of beta<br>
+              Refer 10 friends → Your subscription stays at founding price forever
+            </td></tr>
+          </table>
+          <p style="margin:0 0 8px;font-weight:600;color:#0A0A0F;">Your referral link:</p>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
+            <tr><td style="padding:10px 18px;background:#0A0A0F;border-radius:8px;">
+              <a href="${referralUrl}" style="color:#00D9E6;font-family:monospace;font-size:14px;text-decoration:none;word-break:break-all;">${referralUrl}</a>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 16px;">Every friend you refer also gets founding pricing, so you're not just helping yourself.</p>
+          <p style="margin:0 0 16px;">I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.</p>
+          <p style="margin:0 0 24px;">Not a bad deal, right? :)</p>
+          <p style="margin:0 0 4px;">Love,</p>
+          <p style="margin:0 0 40px;font-weight:600;">Celal</p>
+          <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 20px;">
+          <p style="margin:0;font-size:12px;color:#999;line-height:1.6;">
+            No spam. <a href="${unsubUrl}" style="color:#999;text-decoration:underline;">Unsubscribe anytime.</a><br>
+            Orbly · orbly.app
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `Hey,
+
+You made it. You're #${position} on the Orbly waitlist.
+
+I'm still very early in this, but that's exactly why having you here means a lot to me.
+
+Here's what you've locked in:
+Free during beta. When Orbly launches publicly, your founding price is yours forever. No matter what we charge everyone else, no matter how long it takes.
+
+Want to move up the list? Share your link with people you think would genuinely find this useful:
+
+Refer 2 friends → Jump 50 spots
+Refer 5 friends → 3 extra months free on top of beta
+Refer 10 friends → Your subscription stays at founding price forever
+
+Your referral link: ${referralUrl}
+
+Every friend you refer also gets founding pricing, so you're not just helping yourself.
+
+I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.
+
+Not a bad deal, right? :)
+
+Love,
+Celal
+
+---
+No spam. Unsubscribe anytime: ${unsubUrl}`;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Celal from Orbly <celal@orblyapp.com>",
+      to: [email],
+      reply_to: ["celal@orblyapp.com"],
+      subject: `You're #${position} on the Orbly waitlist`,
+      html,
+      text,
+      headers: {
+        "List-Unsubscribe": `<${unsubUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
+    }),
+  }).catch(() => {
+    // non-blocking — don't fail signup if welcome email fails
   });
 }
 
@@ -168,6 +284,7 @@ export async function POST(
     await kv.set(KEYS.ref(referralCode), email);
     // User hash — full schema
     const refCode = req.nextUrl.searchParams.get("ref");
+    const unsubToken = nanoid(16);
     await kv.hset(KEYS.user(email), {
       id: nanoid(12),
       code: referralCode,
@@ -176,7 +293,10 @@ export async function POST(
       tier: "none" as ReferralTier,
       position: String(position),
       created_at: new Date().toISOString(),
+      unsub_token: unsubToken,
     });
+    // Map token → email for one-click unsubscribe lookups
+    await kv.set(KEYS.unsub(unsubToken), email);
 
     // Handle referral bonus
     if (refCode) {
@@ -206,15 +326,20 @@ export async function POST(
     ]);
     const totalCount = (v1Final ?? 0) + (v2Final ?? 0);
 
-    // Email founder for every new signup. Fire-and-forget — Resend is fast
-    // enough that the function stays alive long enough to complete on Vercel
-    // Fluid / serverless. If delivery ever becomes flaky, upgrade to
-    // `after()` from next/server to guarantee post-response work.
+    // Fire both emails concurrently. Both are fire-and-forget so signup
+    // response latency is not tied to Resend. Welcome email goes to the user,
+    // notify email goes to the founder.
     void notifyNewSignup({
       email,
       position,
       totalCount,
       referredBy: refCode,
+    });
+    void sendWelcomeEmail({
+      email,
+      position,
+      referralCode,
+      unsubToken,
     });
 
     return NextResponse.json({
