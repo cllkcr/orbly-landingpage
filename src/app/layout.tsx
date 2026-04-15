@@ -24,7 +24,8 @@ const inter = Inter({
 });
 
 const SITE_URL = "https://orbly.app";
-const TITLE = "Orbly — Your brain lives in the now";
+const TITLE =
+  "Orbly — The first AI powered app that makes time something you can feel, not just read.";
 const DESCRIPTION =
   "Orbly is the first AI-powered spatial calendar for iOS that makes time something you can feel, not just read. Join the waitlist for founding member access.";
 
