@@ -103,50 +103,32 @@ async function sendWelcomeEmail(params: {
   const referralUrl = `https://orblyapp.com/?ref=${referralCode}`;
   const unsubUrl = `https://orblyapp.com/api/v2/unsubscribe?token=${unsubToken}`;
 
+  // Plain-text-style HTML — no tables, no background colors, no marketing
+  // patterns. Gmail routes plain personal emails to Primary, not Promotions.
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;">
-    <tr><td align="center" style="padding:40px 20px;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
-        <tr><td style="padding-bottom:32px;">
-          <span style="font-size:22px;font-weight:700;color:#0A0A0F;letter-spacing:-0.5px;">Orbly</span>
-        </td></tr>
-        <tr><td style="color:#1a1a1a;font-size:16px;line-height:1.7;">
-          <p style="margin:0 0 16px;">Hey,</p>
-          <p style="margin:0 0 16px;">You made it. You're <strong style="color:#0A0A0F;">#${position}</strong> on the Orbly waitlist.</p>
-          <p style="margin:0 0 16px;">I'm still very early in this, but that's exactly why having you here means a lot to me.</p>
-          <p style="margin:0 0 8px;font-weight:600;color:#0A0A0F;">Here's what you've locked in:</p>
-          <p style="margin:0 0 16px;">Free during beta. When Orbly launches publicly, your founding price is yours forever. No matter what we charge everyone else, no matter how long it takes.</p>
-          <p style="margin:0 0 12px;">Want to move up the list? Share your link with people you think would genuinely find this useful:</p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;width:100%;">
-            <tr><td style="padding:12px 16px;background:#f5f5f7;border-radius:8px;font-size:15px;line-height:1.8;">
-              Refer 2 friends → Jump 50 spots<br>
-              Refer 5 friends → 3 extra months free on top of beta<br>
-              Refer 10 friends → Your subscription stays at founding price forever
-            </td></tr>
-          </table>
-          <p style="margin:0 0 8px;font-weight:600;color:#0A0A0F;">Your referral link:</p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
-            <tr><td style="padding:10px 18px;background:#0A0A0F;border-radius:8px;">
-              <a href="${referralUrl}" style="color:#00D9E6;font-family:monospace;font-size:14px;text-decoration:none;word-break:break-all;">${referralUrl}</a>
-            </td></tr>
-          </table>
-          <p style="margin:0 0 16px;">Every friend you refer also gets founding pricing, so you're not just helping yourself.</p>
-          <p style="margin:0 0 16px;">I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.</p>
-          <p style="margin:0 0 24px;">Catch you on the other side.</p>
-          <p style="margin:0 0 4px;">Love,</p>
-          <p style="margin:0 0 40px;font-weight:600;">Celal</p>
-          <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 20px;">
-          <p style="margin:0;font-size:12px;color:#999;line-height:1.6;">
-            No spam. <a href="${unsubUrl}" style="color:#999;text-decoration:underline;">Unsubscribe anytime.</a><br>
-            Orbly · orblyapp.com
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.7;color:#1a1a1a;background:#ffffff;">
+<div style="max-width:520px;margin:0 auto;padding:40px 24px;">
+  <p>Hey,</p>
+  <p>You made it. You're <strong>#${position}</strong> on the Orbly waitlist.</p>
+  <p>I'm still very early in this, but that's exactly why having you here means a lot to me.</p>
+  <p><strong>Here's what you've locked in:</strong></p>
+  <p>Free during beta. When Orbly launches publicly, your founding price is yours forever. No matter what we charge everyone else, no matter how long it takes.</p>
+  <p>Want to move up the list? Share your link with people you think would genuinely find this useful:</p>
+  <p>
+    Refer 2 friends → Jump 50 spots<br>
+    Refer 5 friends → 3 extra months free on top of beta<br>
+    Refer 10 friends → Your subscription stays at founding price forever
+  </p>
+  <p><strong>Your referral link:</strong><br>
+  <a href="${referralUrl}" style="color:#1a1a1a;">${referralUrl}</a></p>
+  <p>Every friend you refer also gets founding pricing, so you're not just helping yourself.</p>
+  <p>I'll be dropping into your inbox every now and then to share what's going on behind the scenes. What's working, what's not, what's coming next. You'll hear it before anyone else.</p>
+  <p>Catch you on the other side.</p>
+  <p>Love,<br><strong>Celal</strong></p>
+  <p style="margin-top:40px;font-size:12px;color:#999;">No spam. <a href="${unsubUrl}" style="color:#999;">Unsubscribe anytime.</a></p>
+</div>
 </body>
 </html>`;
 
@@ -186,7 +168,7 @@ No spam. Unsubscribe anytime: ${unsubUrl}`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Celal from Orbly <celal@orblyapp.com>",
+      from: "Celal <celal@orblyapp.com>",
       to: [email],
       reply_to: ["celal@orblyapp.com"],
       subject: "This actually means a lot, thank you.",
