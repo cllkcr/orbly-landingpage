@@ -7,10 +7,9 @@ import type {
   ReferralTier,
 } from "@/app/v2/types";
 
-const SEED = 847;
-
 const KEYS = {
   count: "orbly:v2:count",
+  v1count: "orbly:waitlist:count",
   emails: "orbly:v2:emails",
   entries: "orbly:v2:entries",
   ref: (code: string) => `orbly:v2:ref:${code}`,
@@ -33,15 +32,38 @@ function computeTier(count: number): ReferralTier {
   return "none";
 }
 
-// GET — return current v2 waitlist count
+async function notifyFounder(referrerEmail: string): Promise<void> {
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.FOUNDER_EMAIL;
+  if (!key || !to) return;
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM ?? "Orbly <notifications@orbly.app>",
+      to: [to],
+      subject: "Orbly — new founding member (10 referrals)",
+      html: `<p><strong>${referrerEmail}</strong> just reached 10 referrals and earned a one-on-one onboarding call.</p>`,
+    }),
+  }).catch(() => {
+    // non-blocking — don't fail signup if email fails
+  });
+}
+
+// GET — return combined v1 + v2 real waitlist count
 export async function GET(): Promise<NextResponse<V2CountResponse>> {
   try {
     const kv = getRedis();
-    const raw = await kv.get<number>(KEYS.count);
-    const count = raw ?? SEED;
-    return NextResponse.json({ count });
+    const [v1, v2] = await Promise.all([
+      kv.get<number>(KEYS.v1count),
+      kv.get<number>(KEYS.count),
+    ]);
+    return NextResponse.json({ count: (v1 ?? 0) + (v2 ?? 0) });
   } catch {
-    return NextResponse.json({ count: SEED });
+    return NextResponse.json({ count: 0 });
   }
 }
 
@@ -81,16 +103,16 @@ export async function POST(
         tier: ReferralTier;
         position: string;
       }>(KEYS.user(email));
-      const currentCount = await kv.get<number>(KEYS.count);
-      const position = userData?.position
-        ? Number(userData.position)
-        : SEED + 1;
+      const [v1, v2] = await Promise.all([
+        kv.get<number>(KEYS.v1count),
+        kv.get<number>(KEYS.count),
+      ]);
       return NextResponse.json({
-        position,
+        position: userData?.position ? Number(userData.position) : 1,
         referralCode: userData?.code ?? "",
         referralCount: userData?.count ? Number(userData.count) : 0,
         tier: userData?.tier ?? "none",
-        count: currentCount ?? SEED,
+        count: (v1 ?? 0) + (v2 ?? 0),
         duplicate: true,
       });
     }
@@ -104,39 +126,50 @@ export async function POST(
     await kv.zadd(KEYS.entries, { score: position, member: email });
     // Map code → email
     await kv.set(KEYS.ref(referralCode), email);
-    // User hash
+    // User hash — full schema
+    const refCode = req.nextUrl.searchParams.get("ref");
     await kv.hset(KEYS.user(email), {
+      id: nanoid(12),
       code: referralCode,
+      referred_by: refCode ?? "",
       count: 0,
       tier: "none" as ReferralTier,
       position: String(position),
+      created_at: new Date().toISOString(),
     });
 
     // Handle referral bonus
-    const refCode = req.nextUrl.searchParams.get("ref");
     if (refCode) {
       const referrerEmail = await kv.get<string>(KEYS.ref(refCode));
       if (referrerEmail && referrerEmail !== email) {
-        // Increment referrer count
+        // Increment referrer count and update tier
         const newRefCount = await kv.hincrby(KEYS.user(referrerEmail), "count", 1);
         const newTier = computeTier(newRefCount);
+        const prevTier = computeTier(newRefCount - 1);
         await kv.hset(KEYS.user(referrerEmail), { tier: newTier });
         // Move referrer up 50 spots (lower score = higher position)
         await kv.zincrby(KEYS.entries, -50, referrerEmail);
         // Double-sided reward: new user gets -10 bonus
         await kv.zincrby(KEYS.entries, -10, email);
+        // Notify founder when referrer first reaches 'call' tier
+        if (newTier === "call" && prevTier !== "call") {
+          await notifyFounder(referrerEmail);
+        }
       }
     }
 
-    // Fresh count after all ops
-    const finalCount = await kv.get<number>(KEYS.count);
+    // Fresh combined count after all ops
+    const [v1Final, v2Final] = await Promise.all([
+      kv.get<number>(KEYS.v1count),
+      kv.get<number>(KEYS.count),
+    ]);
 
     return NextResponse.json({
       position,
       referralCode,
       referralCount: 0,
       tier: "none",
-      count: finalCount ?? position,
+      count: (v1Final ?? 0) + (v2Final ?? 0),
     });
   } catch (err) {
     console.error("[v2/signup] error:", err);

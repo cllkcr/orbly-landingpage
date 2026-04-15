@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useV2Signup } from "@/hooks/useV2Signup";
 import type { ReferralTier } from "../types";
@@ -20,10 +20,43 @@ export default function ReferralV2() {
   const [copied, setCopied] = useState(false);
 
   const isSuccess = state.status === "success";
-  const position = isSuccess ? state.position : 0;
+  const initialPosition = isSuccess ? state.position : 0;
   const referralCode = isSuccess ? state.referralCode : "";
-  const referralCount = isSuccess ? state.referralCount : 0;
-  const tier = isSuccess ? state.tier : "none";
+  const initialReferralCount = isSuccess ? state.referralCount : 0;
+  const initialTier = isSuccess ? state.tier : ("none" as ReferralTier);
+
+  const [position, setPosition] = useState(initialPosition);
+  const [referralCount, setReferralCount] = useState(initialReferralCount);
+  const [tier, setTier] = useState<ReferralTier>(initialTier);
+
+  // Sync initial values when state first becomes success
+  useEffect(() => {
+    if (isSuccess) {
+      setPosition(initialPosition);
+      setReferralCount(initialReferralCount);
+      setTier(initialTier);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess]);
+
+  // Poll every 30s for live position updates
+  useEffect(() => {
+    if (!isSuccess || !referralCode) return;
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/v2/position?code=${referralCode}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.position) setPosition(data.position);
+        if (typeof data.referralCount === "number") setReferralCount(data.referralCount);
+        if (data.tier) setTier(data.tier as ReferralTier);
+      } catch {
+        // silent — don't disrupt UI on network error
+      }
+    };
+    const id = setInterval(poll, 30_000);
+    return () => clearInterval(id);
+  }, [isSuccess, referralCode]);
 
   const shareUrl = `https://orbly.app/v2?ref=${referralCode}`;
   const shareText = `I just joined the Orbly waitlist — the first calendar you can feel. Check it out:`;

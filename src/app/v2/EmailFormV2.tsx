@@ -21,10 +21,11 @@ export default function EmailFormV2({ id, initialRef }: EmailFormV2Props) {
           <motion.form
             key="form"
             onSubmit={(e) => handleSubmit(e, initialRef)}
-            className="flex flex-col sm:flex-row gap-3 w-full"
+            className="flex flex-col gap-2 w-full"
             exit={{ opacity: 0, y: -8, scale: 0.98, transition: { duration: 0.25 } }}
             id={id}
           >
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
             <label htmlFor={`${id ?? "v2"}-email`} className="sr-only">
               Email address
             </label>
@@ -74,6 +75,14 @@ export default function EmailFormV2({ id, initialRef }: EmailFormV2Props) {
                 "Reserve my spot"
               )}
             </motion.button>
+            </div>
+            <p
+              className="text-[11px] font-[family-name:var(--font-jetbrains)]
+                tracking-[0.18em] uppercase text-[var(--text-secondary)]/60
+                text-center mt-1"
+            >
+              No spam, ever
+            </p>
           </motion.form>
         ) : (
           <motion.div

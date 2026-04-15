@@ -6,11 +6,7 @@ import type {
   SignupState,
   V2ApiSuccessResponse,
   V2CountResponse,
-  WAITLIST_SEED,
 } from "@/app/v2/types";
-
-// Silence unused import lint — WAITLIST_SEED is used as fallback value
-const SEED = 847 as typeof WAITLIST_SEED;
 
 type Listener = () => void;
 
@@ -23,7 +19,7 @@ interface V2StoreState {
 let state: V2StoreState = {
   signup: { status: "idle" },
   email: "",
-  count: SEED,
+  count: 0,
 };
 
 const listeners = new Set<Listener>();

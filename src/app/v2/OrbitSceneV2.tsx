@@ -9,7 +9,6 @@ import React, {
   Component,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Text, Html } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 
@@ -37,7 +36,6 @@ const PLANET_DATA = [
 ] as const;
 
 const RING_RADII = [1.8, 3.2, 4.8] as const;
-const RING_LABELS = ["TODAY", "THIS WEEK", "THIS MONTH"] as const;
 const MAX_TRAIL = 50;
 
 // ── Starfield ──────────────────────────────────────────────
@@ -79,23 +77,11 @@ function Starfield({ count = 1200 }: { count?: number }) {
 // ── Glowing NOW sphere ─────────────────────────────────────
 function NowSphere() {
   const coreRef = useRef<THREE.Mesh>(null);
-  const haloRef = useRef<THREE.Mesh>(null);
-  const outerRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     const pulse = 1 + Math.sin(t * 1.8) * 0.06;
     if (coreRef.current) coreRef.current.scale.setScalar(pulse);
-    if (haloRef.current) {
-      haloRef.current.scale.setScalar(pulse * 1.8);
-      (haloRef.current.material as THREE.MeshBasicMaterial).opacity =
-        0.08 + Math.sin(t * 2.5) * 0.03;
-    }
-    if (outerRef.current) {
-      outerRef.current.scale.setScalar(pulse * 3);
-      (outerRef.current.material as THREE.MeshBasicMaterial).opacity =
-        0.03 + Math.sin(t * 1.5) * 0.015;
-    }
   });
 
   return (
@@ -105,48 +91,19 @@ function NowSphere() {
         <meshStandardMaterial
           color="#ffffff"
           emissive="#ffffff"
-          emissiveIntensity={3}
-          toneMapped={false}
+          emissiveIntensity={0.6}
+          roughness={0.2}
+          metalness={0}
         />
       </mesh>
-      <mesh ref={haloRef}>
-        <sphereGeometry args={[0.3, 32, 32]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.08}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh ref={outerRef}>
-        <sphereGeometry args={[0.3, 24, 24]} />
-        <meshBasicMaterial
-          color={COLORS.teal}
-          transparent
-          opacity={0.03}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      <pointLight color="#ffffff" intensity={3} distance={8} decay={2} />
-      <pointLight color={COLORS.teal} intensity={1} distance={5} decay={2} />
-      <Text
-        position={[0, -0.6, 0]}
-        fontSize={0.18}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        letterSpacing={0.2}
-      >
-        NOW
-      </Text>
+      <pointLight color="#ffffff" intensity={0.8} distance={5} decay={2} />
+      <pointLight color={COLORS.teal} intensity={0.4} distance={3} decay={2} />
     </group>
   );
 }
 
 // ── Orbital ring ───────────────────────────────────────────
-function OrbitalRing({ radius, label }: { radius: number; label: string }) {
+function OrbitalRing({ radius }: { radius: number }) {
   const ringRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
@@ -162,17 +119,6 @@ function OrbitalRing({ radius, label }: { radius: number; label: string }) {
         <torusGeometry args={[radius, 0.006, 8, 120]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.07} />
       </mesh>
-      <Text
-        position={[radius + 0.2, 0, 0.05]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.1}
-        color="#444466"
-        anchorX="left"
-        anchorY="middle"
-        letterSpacing={0.1}
-      >
-        {label}
-      </Text>
     </group>
   );
 }
@@ -318,26 +264,6 @@ function Planet({
           roughness={0.3}
           metalness={0.1}
         />
-        {hovered && (
-          <Html center distanceFactor={8} style={{ pointerEvents: "none" }}>
-            <div
-              style={{
-                whiteSpace: "nowrap",
-                borderRadius: "8px",
-                padding: "6px 12px",
-                fontSize: "12px",
-                background: "rgba(10,10,15,0.92)",
-                border: `1px solid ${data.color}40`,
-                color: data.color,
-                fontFamily: "var(--font-jetbrains), monospace",
-                backdropFilter: "blur(10px)",
-                boxShadow: `0 0 20px ${data.color}20`,
-              }}
-            >
-              {data.task}
-            </div>
-          </Html>
-        )}
       </mesh>
     </group>
   );
@@ -399,7 +325,7 @@ function SceneV2({
       <Starfield count={isMobile ? 400 : 1200} />
       <NowSphere />
       {RING_RADII.map((r, i) => (
-        <OrbitalRing key={i} radius={r} label={RING_LABELS[i]} />
+        <OrbitalRing key={i} radius={r} />
       ))}
       {PLANET_DATA.map((p, i) => (
         <Planet key={i} data={p} isMobile={isMobile} />
@@ -407,8 +333,8 @@ function SceneV2({
       {/* Bloom postprocessing — only emissive surfaces bloom */}
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.2}
-          intensity={0.9}
+          luminanceThreshold={0.3}
+          intensity={0.55}
           mipmapBlur
         />
       </EffectComposer>

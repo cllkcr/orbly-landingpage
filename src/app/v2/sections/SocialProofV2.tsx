@@ -32,28 +32,48 @@ const TESTIMONIALS = [
   },
 ] as const;
 
+// Match the threshold used in WaitlistCounterV2 so the counter framing stays
+// consistent across the page.
+const EARLY_ACCESS_THRESHOLD = 25 as const;
+
 export default function SocialProofV2() {
   const { count } = useV2Signup();
   const counterRef = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
+  const isEarly = count > 0 && count < EARLY_ACCESS_THRESHOLD;
+  const label = count <= 0
+    ? "reserving their spot"
+    : isEarly
+      ? count === 1 ? "early believer so far" : "early believers so far"
+      : "on the waitlist";
+
   useEffect(() => {
-    if (!counterRef.current) return;
+    if (!counterRef.current || count <= 0) return;
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
+    const node = counterRef.current;
+
+    // Tiny counts look silly when animated; snap directly instead.
+    if (prefersReduced || count < 10) {
+      node.textContent = count.toLocaleString();
+      hasAnimated.current = true;
+      return;
+    }
+
     const proxy = { val: 0 };
-    ScrollTrigger.create({
-      trigger: counterRef.current,
-      start: "top 70%",
+    const trigger = ScrollTrigger.create({
+      trigger: node,
+      start: "top 80%",
       once: true,
       onEnter: () => {
         if (hasAnimated.current) return;
         hasAnimated.current = true;
         gsap.to(proxy, {
           val: count,
-          duration: prefersReduced ? 0 : 2,
+          duration: 1.8,
           ease: "power2.out",
           onUpdate: () => {
             if (counterRef.current) {
@@ -64,23 +84,64 @@ export default function SocialProofV2() {
         });
       },
     });
+
+    return () => {
+      trigger.kill();
+    };
   }, [count]);
 
   return (
     <section
-      className="py-20 md:py-40 bg-[var(--bg-dark)]"
-      aria-label="Social proof"
+      className="py-24 md:py-40 bg-[var(--bg-dark)]"
+      aria-labelledby="social-proof-heading"
     >
       <div className="max-w-5xl mx-auto px-4 md:px-6">
+        {/* Section eyebrow */}
+        <h2
+          id="social-proof-heading"
+          className="text-center font-[family-name:var(--font-jetbrains)]
+            text-[11px] md:text-xs uppercase tracking-[0.24em]
+            text-[var(--color-teal)] mb-4"
+        >
+          Early access
+        </h2>
+
         {/* Counter */}
-        <div className="text-center mb-14 md:mb-16">
-          <p className="font-[family-name:var(--font-jetbrains)] text-[clamp(2.5rem,6vw,4rem)] font-bold text-[var(--text-primary)] tabular-nums leading-none mb-2">
-            <span ref={counterRef} aria-live="polite">
-              0
-            </span>
-          </p>
-          <p className="text-[var(--text-secondary)] font-[family-name:var(--font-inter)] text-base md:text-lg">
-            on the waitlist
+        <div className="text-center mb-16 md:mb-20">
+          {count > 0 ? (
+            <p
+              className="font-[family-name:var(--font-playfair)] italic
+                text-[clamp(2.75rem,6.5vw,4.5rem)] font-medium
+                text-[var(--text-primary)] tabular-nums leading-none mb-3"
+            >
+              <span
+                ref={counterRef}
+                aria-live="polite"
+                style={{
+                  background:
+                    "linear-gradient(180deg, var(--text-primary) 0%, var(--text-secondary) 140%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                {count.toLocaleString()}
+              </span>
+            </p>
+          ) : (
+            <p
+              className="font-[family-name:var(--font-playfair)] italic
+                text-[clamp(2rem,4vw,3rem)] font-medium
+                text-[var(--text-primary)] leading-none mb-3"
+            >
+              Be the first
+            </p>
+          )}
+          <p
+            className="font-[family-name:var(--font-jetbrains)] text-xs md:text-sm
+              uppercase tracking-[0.2em] text-[var(--text-secondary)]"
+          >
+            {label}
           </p>
         </div>
 
@@ -97,28 +158,62 @@ export default function SocialProofV2() {
                 duration: 0.6,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="relative p-6 md:p-7 rounded-2xl
-                bg-white/[0.03] border border-white/[0.06]
-                overflow-hidden"
+              whileHover={{ y: -4 }}
+              className="group relative p-7 md:p-8 rounded-2xl
+                bg-[var(--bg-dark-elevated)]/60 border border-[var(--border-subtle)]
+                backdrop-blur-sm overflow-hidden transition-colors duration-300
+                hover:border-white/[0.12]"
             >
-              {/* Color accent bar */}
+              {/* Top color accent bar with glow */}
               <div
-                className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
-                style={{ background: t.color }}
+                className="absolute left-0 right-0 top-0 h-[2px]"
+                style={{
+                  background: `linear-gradient(to right, transparent, ${t.color}, transparent)`,
+                  boxShadow: `0 0 16px ${t.color}`,
+                  opacity: 0.85,
+                }}
                 aria-hidden="true"
               />
 
+              {/* Decorative oversized quote mark */}
+              <span
+                aria-hidden="true"
+                className="absolute top-3 right-4
+                  font-[family-name:var(--font-playfair)] leading-none
+                  text-[4.5rem] md:text-[5rem] select-none pointer-events-none
+                  transition-opacity duration-500 group-hover:opacity-20"
+                style={{ color: t.color, opacity: 0.1 }}
+              >
+                &ldquo;
+              </span>
+
               <blockquote>
-                <p className="text-[var(--text-secondary)] italic font-[family-name:var(--font-playfair)] leading-relaxed text-base mb-5">
-                  &ldquo;{t.quote}&rdquo;
+                <p
+                  className="relative text-[var(--text-primary)] italic
+                    font-[family-name:var(--font-inter)]
+                    leading-[1.6] text-[15px] md:text-base mb-6"
+                >
+                  {t.quote}
                 </p>
               </blockquote>
-              <figcaption className="font-[family-name:var(--font-jetbrains)] text-xs tracking-wide">
-                <span className="text-[var(--text-primary)] font-medium">
-                  {t.name}
-                </span>
-                <span className="text-[var(--text-secondary)] ml-1">
-                  — {t.role}
+
+              <figcaption
+                className="relative flex items-center gap-3
+                  font-[family-name:var(--font-jetbrains)] text-[11px]
+                  uppercase tracking-[0.16em]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="inline-block h-px w-6"
+                  style={{ background: t.color, opacity: 0.6 }}
+                />
+                <span>
+                  <cite className="not-italic text-[var(--text-primary)] font-medium">
+                    {t.name}
+                  </cite>
+                  <span className="text-[var(--text-secondary)] ml-2">
+                    {t.role}
+                  </span>
                 </span>
               </figcaption>
             </motion.figure>

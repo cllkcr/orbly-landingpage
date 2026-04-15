@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
@@ -106,37 +107,60 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
     >
       <OrbitSceneV2 zoomProgress={zoomProgress} />
 
-      {/* Scrims for text readability */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[var(--bg-dark)]/80 via-[var(--bg-dark)]/40 to-[var(--bg-dark)]/85 pointer-events-none" />
+      {/* Scrims — light enough to let the orbit field breathe */}
       <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,10,15,0.65) 0%, transparent 70%)",
+            "linear-gradient(to bottom, rgba(10,10,15,0.50) 0%, rgba(10,10,15,0.15) 42%, rgba(10,10,15,0.60) 100%)",
+        }}
+      />
+      {/* Central vignette — darker to protect text contrast over bright planets */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 65% 50% at 50% 52%, rgba(10,10,15,0.62) 0%, transparent 72%)",
+        }}
+      />
+      {/* Tight text-safe zone — guaranteed dark surface directly behind content */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 48% 38% at 50% 52%, rgba(10,10,15,0.28) 0%, transparent 100%)",
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-6 max-w-3xl mx-auto gap-5 md:gap-6 pt-20 md:pt-24 pb-14 md:pb-16">
+      <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-6 max-w-2xl mx-auto gap-4 md:gap-5 py-24 md:py-0">
         {/* Badge */}
         <div
           ref={badgeRef}
-          style={{ visibility: "hidden" }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
-            bg-white/[0.06] border border-white/[0.08] backdrop-blur-md"
+            border border-white/[0.10] backdrop-blur-md"
+          style={{
+            visibility: "hidden",
+            background: "rgba(10,10,15,0.72)",
+          }}
         >
-          <span
+          <motion.span
+            animate={{ scale: [1, 1.9, 1], opacity: [1, 0.15, 1] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
             className="w-1.5 h-1.5 rounded-full bg-[var(--color-teal)]"
             aria-hidden="true"
           />
-          <span className="text-xs font-[family-name:var(--font-jetbrains)] text-[var(--text-secondary)] tracking-widest uppercase">
-            iOS Only &middot; Coming Soon
+          <span
+            className="text-xs font-[family-name:var(--font-jetbrains)] text-[#C0C0D0] tracking-widest"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}
+          >
+            iOS only &middot; Coming soon
           </span>
         </div>
 
         {/* Headline */}
         <h1
           ref={headlineRef}
-          className="font-[family-name:var(--font-playfair)] text-[clamp(2.2rem,6vw,4.2rem)] leading-[1.1] font-semibold tracking-[-0.02em] text-[var(--text-primary)]"
+          className="font-[family-name:var(--font-playfair)] text-[clamp(2.4rem,6.5vw,4.5rem)] leading-[1.08] font-semibold tracking-[-0.025em] text-[var(--text-primary)] text-balance"
           style={{
             visibility: "hidden",
             textShadow:
@@ -144,7 +168,7 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
           }}
         >
           Your brain lives in the now.{" "}
-          <span className="orbly-gradient">
+          <span className="text-[var(--color-teal)]">
             Orbly pulls the future into it.
           </span>
         </h1>
@@ -152,10 +176,10 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
         {/* Subheadline — Inter body */}
         <p
           ref={subRef}
-          className="text-lg md:text-xl text-[var(--text-secondary)] max-w-lg leading-relaxed font-[family-name:var(--font-inter)]"
+          className="text-base md:text-lg text-[#BEBECE] max-w-xs md:max-w-sm leading-relaxed font-[family-name:var(--font-inter)]"
           style={{
             visibility: "hidden",
-            textShadow: "0 1px 12px rgba(0,0,0,0.7)",
+            textShadow: "0 1px 16px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.75)",
           }}
         >
           See what&apos;s coming. Feel what&apos;s close.{" "}
@@ -163,7 +187,7 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
         </p>
 
         {/* Form */}
-        <div ref={formRef} style={{ visibility: "hidden" }} className="w-full mt-2">
+        <div ref={formRef} style={{ visibility: "hidden" }} className="w-full">
           <EmailFormV2 id="hero-v2-email" initialRef={initialRef} />
         </div>
 
@@ -180,8 +204,8 @@ export default function HeroV2({ initialRef }: HeroV2Props) {
           scrolled ? "opacity-0 pointer-events-none" : ""
         }`}
       >
-        <span className="text-[11px] font-[family-name:var(--font-jetbrains)] text-[var(--text-secondary)] tracking-widest uppercase">
-          Scroll
+        <span className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[var(--text-secondary)]/60 tracking-[0.25em]">
+          scroll
         </span>
         <div className="w-[1px] h-8 relative overflow-hidden">
           <div className="absolute inset-x-0 h-full bg-gradient-to-b from-white/40 to-transparent animate-[scroll-line_2s_ease-in-out_infinite]" />

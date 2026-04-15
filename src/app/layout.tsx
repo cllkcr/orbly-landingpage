@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display, JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -16,10 +16,17 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500", "700"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500"],
+});
+
 const SITE_URL = "https://orbly.app";
-const TITLE = "Orbly — The first calendar you can feel";
+const TITLE = "Orbly — Your brain lives in the now";
 const DESCRIPTION =
-  "Tasks orbit your Now. Distance shows urgency. The closer it gets, the sooner it's due. Join the waitlist for iOS.";
+  "See what's coming. Feel what's close. Let Orbly handle the rest. Join the waitlist for iOS.";
 
 export const viewport: Viewport = {
   themeColor: "#0A0A0F",
@@ -41,6 +48,9 @@ export const metadata: Metadata = {
     "waitlist",
     "visual calendar",
     "time management",
+    "ADHD calendar",
+    "voice calendar",
+    "focus timer",
   ],
   authors: [{ name: "Orbly" }],
   creator: "Orbly",
@@ -135,7 +145,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${jetbrains.variable} antialiased`}
+      className={`${playfair.variable} ${jetbrains.variable} ${inter.variable} antialiased`}
     >
       <head>
         <JsonLd />

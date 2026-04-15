@@ -1,9 +1,54 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import type { ReactNode } from "react";
+import CitationTooltip from "../CitationTooltip";
 
-// ── Pillar data — typed as const, no boolean props ─────────
-const PILLARS = [
+// Inline SVG icons — stroke-based, aria-hidden, no dependency
+const ICONS: Record<"01" | "02" | "03" | "04", ReactNode> = {
+  // Eye — "you see it"
+  "01": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  // Mic — "you say it"
+  "02": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="2" width="6" height="11" rx="3" />
+      <path d="M5 10a7 7 0 0 0 14 0" />
+      <path d="M12 17v4" />
+      <path d="M8 21h8" />
+    </svg>
+  ),
+  // Shield + check — "orbly watches your back"
+  "03": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  ),
+  // Stopwatch — "orbly keeps time" (Pomodoro reference)
+  "04": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="14" r="8" />
+      <path d="M12 14V10M12 14H15" />
+      <path d="M9.5 2.5h5" />
+      <path d="M12 2.5V6" />
+    </svg>
+  ),
+};
+
+type Pillar = {
+  number: "01" | "02" | "03" | "04";
+  title: string;
+  body: ReactNode;
+  commands: readonly string[] | null;
+  color: string;
+};
+
+const PILLARS: readonly Pillar[] = [
   {
     number: "01",
     title: "You see it. You feel it. You decide.",
@@ -25,7 +70,19 @@ const PILLARS = [
   {
     number: "03",
     title: "You focus. Orbly watches your back.",
-    body: "Your internal clock is unreliable — research confirms it. When something important is drifting close and you haven't touched it yet, Orbly quietly steps in. Not with noise. With the right prompt at the right moment. So nothing slips while you're deep in the work — and you never have to wonder what you missed.",
+    body: (
+      <>
+        Your internal clock is unreliable —{" "}
+        <CitationTooltip citation="Grondin et al. (2010)">
+          research
+        </CitationTooltip>{" "}
+        confirms it. When something important is drifting close and you
+        haven&apos;t touched it yet, Orbly quietly steps in. Not with noise.
+        With the right prompt at the right moment. So nothing slips while
+        you&apos;re deep in the work — and you never have to wonder what you
+        missed.
+      </>
+    ),
     commands: null,
     color: "var(--color-violet)",
   },
@@ -36,7 +93,7 @@ const PILLARS = [
     commands: null,
     color: "var(--color-apricot)",
   },
-] as const;
+];
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -58,7 +115,6 @@ export default function PillarsV2() {
       aria-label="Four pillars of Orbly"
     >
       <div className="max-w-6xl mx-auto px-4 md:px-6">
-        {/* Section header */}
         <div className="text-center mb-12 md:mb-16">
           <p className="text-xs font-[family-name:var(--font-jetbrains)] text-[var(--color-teal)]/70 tracking-[0.2em] uppercase mb-4">
             Everything you need to run your time
@@ -67,8 +123,6 @@ export default function PillarsV2() {
             In one orbit.
           </h2>
         </div>
-
-        {/* 2×2 grid desktop, 1-col mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {PILLARS.map((pillar, i) => (
             <motion.article
@@ -84,33 +138,22 @@ export default function PillarsV2() {
                 scale: 1.02,
                 transition: { type: "spring", stiffness: 350, damping: 22 },
               }}
-              className="relative p-6 md:p-8 rounded-2xl
-                bg-white/[0.03] border border-white/[0.06]
-                hover:border-white/[0.10] hover:bg-white/[0.05]
-                transition-colors duration-300 cursor-default"
+              className="relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.10] hover:bg-white/[0.05] transition-colors duration-300 cursor-default"
             >
-              {/* Subtle color accent top-left */}
               <div
                 className="absolute top-0 left-0 w-16 h-0.5 rounded-full rounded-tl-2xl"
                 style={{ background: pillar.color, opacity: 0.5 }}
                 aria-hidden="true"
               />
-
-              {/* Number label */}
               <span
-                aria-hidden="true"
-                className="inline-block font-[family-name:var(--font-jetbrains)] text-xs tracking-[0.15em] mb-5"
-                style={{ color: pillar.color, opacity: 0.7 }}
+                className="inline-flex mb-5"
+                style={{ color: pillar.color, opacity: 0.85 }}
               >
-                {pillar.number}
+                {ICONS[pillar.number]}
               </span>
-
-              {/* Title */}
               <h3 className="font-[family-name:var(--font-playfair)] text-xl md:text-2xl font-semibold text-[var(--text-primary)] leading-[1.2] mb-4">
                 {pillar.title}
               </h3>
-
-              {/* Voice command examples (pillar 02 only) */}
               {pillar.commands && (
                 <div className="mb-4 space-y-1.5">
                   {pillar.commands.map((cmd, ci) => (
@@ -123,8 +166,6 @@ export default function PillarsV2() {
                   ))}
                 </div>
               )}
-
-              {/* Body — Inter */}
               <p className="text-[var(--text-secondary)] leading-relaxed font-[family-name:var(--font-inter)] text-sm md:text-base">
                 {pillar.body}
               </p>

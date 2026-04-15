@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Orbly — The first calendar you can feel";
+export const alt = "Orbly — Your brain lives in the now";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -138,14 +138,15 @@ export default async function Image() {
             style={{
               display: "flex",
               flexDirection: "column",
-              fontSize: "64px",
+              fontSize: "60px",
               fontWeight: 700,
               lineHeight: 1.1,
               marginBottom: "20px",
             }}
           >
-            <span style={{ color: "#E8E8F0" }}>The first calendar</span>
-            <span style={{ color: "#00D9E6" }}>you can feel.</span>
+            <span style={{ color: "#E8E8F0" }}>Your brain lives</span>
+            <span style={{ color: "#E8E8F0" }}>in the now.</span>
+            <span style={{ color: "#00D9E6" }}>Orbly pulls the future in.</span>
           </div>
 
           {/* Subline */}
@@ -156,7 +157,7 @@ export default async function Image() {
               letterSpacing: "0.02em",
             }}
           >
-            Tasks orbit your Now. Distance shows urgency.
+            See what&apos;s coming. Feel what&apos;s close.
           </span>
 
           {/* CTA row */}

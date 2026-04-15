@@ -29,17 +29,19 @@ export async function GET(
       return NextResponse.json({ error: "Code not found" }, { status: 404 });
     }
 
-    // Current position from sorted set score
-    const score = await kv.zscore("orbly:v2:entries", email);
-    const userData = await kv.hgetall<{
-      code: string;
-      count: string;
-      tier: ReferralTier;
-      position: string;
-    }>(`orbly:v2:user:${email}`);
+    // True list rank (0-indexed ascending), convert to 1-indexed position
+    const [rank, userData] = await Promise.all([
+      kv.zrank("orbly:v2:entries", email),
+      kv.hgetall<{
+        code: string;
+        count: string;
+        tier: ReferralTier;
+        position: string;
+      }>(`orbly:v2:user:${email}`),
+    ]);
 
     return NextResponse.json({
-      position: score !== null ? Number(score) : Number(userData?.position ?? 0),
+      position: rank !== null ? rank + 1 : Number(userData?.position ?? 0),
       referralCount: userData?.count ? Number(userData.count) : 0,
       tier: userData?.tier ?? "none",
       referralCode: code,
