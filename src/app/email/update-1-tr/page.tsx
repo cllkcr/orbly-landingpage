@@ -100,8 +100,7 @@ export default function TurkishUpdatePage() {
           </div>
 
           <p style={P}>
-            Buraya kadar gördüklerinizle ilgili düşünceleriniz, önerileriniz ya da herhangi
-            bir sorunuz varsa — yanıtlayabilirsiniz. Gerçekten okuyorum.
+            Buraya kadar gördüklerinizle ilgili düşünceleriniz, önerileriniz ya da herhangi bir sorunuz varsa bana ulaşın lütfen, fikirleriniz benim için çok değerli.
           </p>
 
           <p style={P}>Burada olduğunuz için teşekkür ederim.</p>
