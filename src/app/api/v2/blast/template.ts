@@ -11,6 +11,7 @@ const IMG = {
   reminders:      `${BASE}/email/reminders.jpg`,
   orbitWeek:      `${BASE}/email/orbit-week.jpg`,
   orbitDay:       `${BASE}/email/orbit-day.jpg`,
+  orbitAll:       `${BASE}/email/orbit-all.jpg`,
   videoThumb:     `${BASE}/email/video-thumb.jpg`,
 };
 
@@ -93,6 +94,8 @@ export function buildBlastEmail(params: { unsubUrl: string }): { html: string; t
     { src: IMG.orbitWeek, alt: "This Week orbital view" },
     { src: IMG.orbitDay,  alt: "Today orbital view" }
   )}
+
+  ${screenshot(IMG.orbitAll, "April 2026 orbital view")}
 
   <p style="${P}">
     Also: grounding everything in ADHD science matters a lot to me. I've been reading

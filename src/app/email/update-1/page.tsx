@@ -46,11 +46,16 @@ export default function EnglishUpdatePage() {
             Working on visual communication — someone should understand it intuitively on first look.
           </p>
 
-          <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <img src={`${BASE}/email/orbit-week.jpg`} alt="This Week"
               style={{ width: "50%", borderRadius: 18 }} />
             <img src={`${BASE}/email/orbit-day.jpg`} alt="Today"
               style={{ width: "50%", borderRadius: 18 }} />
+          </div>
+
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <img src={`${BASE}/email/orbit-all.jpg`} alt="April 2026"
+              style={{ maxWidth: 280, width: "100%", borderRadius: 22 }} />
           </div>
 
           <p style={P}>

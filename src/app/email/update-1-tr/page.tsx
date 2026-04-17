@@ -69,11 +69,16 @@ export default function TurkishUpdatePage() {
             çalışıyorum. Yine burada da çok bunaltıcı olmamak önemli.
           </p>
 
-          <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <img src={`${BASE}/email/orbit-week.jpg`} alt="Bu hafta görünümü"
               style={{ width: "50%", borderRadius: 18 }} />
             <img src={`${BASE}/email/orbit-day.jpg`} alt="Bugün görünümü"
               style={{ width: "50%", borderRadius: 18 }} />
+          </div>
+
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <img src={`${BASE}/email/orbit-all.jpg`} alt="Nisan 2026 görünümü"
+              style={{ maxWidth: 280, width: "100%", borderRadius: 22 }} />
           </div>
 
           <p style={P}>
