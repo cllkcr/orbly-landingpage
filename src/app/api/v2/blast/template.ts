@@ -1,6 +1,6 @@
 // ── Blast email template ─────────────────────────────────────────────────────
 
-const BASE = "https://orblyapp.com";
+const BASE = "https://www.orblyapp.com";
 
 export const VIDEO_URL   = `${BASE}/email/video.mp4`;
 export const TURKISH_URL = `${BASE}/email/update-1-tr`;
