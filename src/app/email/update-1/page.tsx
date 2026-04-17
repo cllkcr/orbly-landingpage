@@ -42,7 +42,7 @@ export default function EnglishUpdatePage() {
 
           <p style={P}><strong>The 3D orbital view.</strong></p>
           <p style={P}>
-            Each ring is a day. Each sphere is a task. You can drag tasks toward the NOW sphere.
+            Each ring is a day. Each sphere is a task. As time passes, they drift toward the NOW sphere.
             Working on visual communication — someone should understand it intuitively on first look.
           </p>
 

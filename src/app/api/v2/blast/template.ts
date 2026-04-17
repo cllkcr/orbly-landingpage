@@ -84,7 +84,7 @@ export function buildBlastEmail(params: { unsubUrl: string }): { html: string; t
   <p style="${P}"><strong>Now the exciting part: the 3D orbital view.</strong></p>
 
   <p style="${P}">
-    Each ring is a day. Each sphere is a task. You can drag tasks toward the NOW sphere.
+    Each ring is a day. Each sphere is a task. As time passes, they drift toward the NOW sphere.
     It looks great, but what I'm working on right now is visual communication.
     Someone opening that screen for the first time should understand it intuitively,
     without reading anything, without asking "what is this?" Still figuring it out.
@@ -145,7 +145,7 @@ Quick update, things are moving faster than I expected.
 
 The core screens are done: calendar, reminders, focus timer. Building with iOS 26's Liquid Glass design language. The real challenge isn't making it look nice, it's making it calm. ADHD brains are already overstimulated. Visually engaging but quiet.
 
-The 3D orbital view: each ring is a day, each sphere is a task. You can drag tasks toward the NOW sphere. Working on visual communication so someone understands it intuitively on first look.
+The 3D orbital view: each ring is a day, each sphere is a task. As time passes, they drift toward the NOW sphere. Working on visual communication so someone understands it intuitively on first look.
 
 Grounding everything in ADHD science matters to me. Russell Barkley's work on attention, impulse control, time perception is really valuable. Slightly wild idea: getting his feedback on this would be incredible.
 

@@ -62,8 +62,8 @@ export default function TurkishUpdatePage() {
           <p style={P}><strong>Gelelim en eğlenceli kısma.</strong></p>
 
           <p style={P}>
-            3D olarak orbitimiz ve tasklarımız gayet güzel gözüküyor. Taskları NOW küresine
-            doğru çekebiliyoruz. Bu ekrandaki asıl sıkıntı ise görsel iletişim. Kullanıcının
+            3D olarak orbitimiz ve tasklarımız gayet güzel gözüküyor. Zaman geçtikçe tasklar
+            NOW küresine doğru kayıyor. Bu ekrandaki asıl sıkıntı ise görsel iletişim. Kullanıcının
             orbitteki halkaların ne anlama geldiğini, hangi elementin neyi ifade ettiğini
             kolay bir şekilde anlayabilmesi lazım. Hem UI hem UX tarafında bunu desteklemeye
             çalışıyorum. Yine burada da çok bunaltıcı olmamak önemli.
