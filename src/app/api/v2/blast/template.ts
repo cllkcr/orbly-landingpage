@@ -9,9 +9,9 @@ const IMG = {
   timerPomodoro:  `${BASE}/email/timer-pomodoro.jpg`,
   timerTimeTimer: `${BASE}/email/timer-timetimer.jpg`,
   reminders:      `${BASE}/email/reminders.jpg`,
-  orbitWeek:      `${BASE}/email/orbit-week.jpg`,
-  orbitDay:       `${BASE}/email/orbit-day.jpg`,
-  orbitAll:       `${BASE}/email/orbit-all.jpg`,
+  orbitWeek:      `${BASE}/email/orbit-week-v2.jpg`,
+  orbitDay:       `${BASE}/email/orbit-day-v2.jpg`,
+  orbitAll:       `${BASE}/email/orbit-all-v2.jpg`,
   videoThumb:     `${BASE}/email/video-thumb.jpg`,
 };
 
