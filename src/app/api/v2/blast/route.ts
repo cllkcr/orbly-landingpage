@@ -51,7 +51,7 @@ interface ResendEmail {
   subject:  string;
   html:     string;
   text:     string;
-  headers:  Record<string, string>;
+  headers?: Record<string, string>;
 }
 
 interface RecipientInfo {
@@ -117,7 +117,7 @@ async function collectRecipients(kv: Redis): Promise<RecipientInfo[]> {
 
 // ── Build Resend payload ─────────────────────────────────────────────────────
 
-const SUBJECT = "Orbly nerede şimdi / A progress update";
+const SUBJECT = "thought you'd want to see this";
 const FROM    = "Celal <celal@orblyapp.com>";
 const REPLY   = "celal@orblyapp.com";
 const UNSUB_BASE = "https://orblyapp.com/api/v2/unsubscribe";
@@ -133,10 +133,8 @@ function buildPayload(recipient: RecipientInfo): ResendEmail {
     subject:  SUBJECT,
     html,
     text:     text.replace("{UNSUB_URL}", unsubUrl),
-    headers: {
-      "List-Unsubscribe":      `<${unsubUrl}>`,
-      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-    },
+    // No List-Unsubscribe header — signals bulk to Gmail → Promotions.
+    // Unsubscribe link lives in the email footer text only.
   };
 }
 
